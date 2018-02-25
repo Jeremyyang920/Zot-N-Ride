@@ -1,5 +1,5 @@
 import random
-import collections
+from collections import defaultdict
 import json
 import urllib.parse
 import urllib.request
@@ -7,6 +7,7 @@ import urllib.request
 ### CONSTANTS
 UCI_PLACE_ID = 'ChIJkb-SJQ7e3IAR7LfattDF-3k'
 GOOGLE_API_KEY = 'AIzaSyAk1S7XvdmV-WpxfzuA7wuyeMuQfFkO1qA'
+BUFFER_PICKUP_TIME = 5*60
 
 class User:
     def __init__(self, **kwargs):
@@ -38,6 +39,9 @@ class User:
         self.address = kwargs.get('address')
         # self.address_street, self.address_zip = kwargs.get('address').split(';')
         self.time_to_uci = self.calc_driving_time_to_uci()
+
+    def __repr__(self):
+        return self.full_name
 
     def get_full_name(self):
         return self.first_name + ' ' + self.last_name
@@ -97,15 +101,26 @@ def get_json(url: str) -> dict:
             response.close()
 
 def match_users(drivers: [Driver], riders: [Rider]):
-    result = []
-    for d in drivers:
-        for r in riders:
-            delta_t = (calc_driving_time(d.address,r.address) + r.time_to_uci + 5) - d.time_to_uci
-            result.append(d,r,delta_t)
+    result = defaultdict(dict)
+    for r in riders:
+        for d in drivers:
+            delta_t = (calc_driving_time(d.address,r.address) + r.time_to_uci + BUFFER_PICKUP_TIME) - d.time_to_uci
+            result[r][d] = delta_t
+    return extract_matches(result)
+
+def extract_matches(input_dict):
+    result = dict()
+    for k in input_dict:
+        result[k] = min(input_dict[k].items(),key = lambda x: x[1])[0]
     return result
 
 if __name__ == '__main__':
     c = Car(make="Hyundai",model="Sonata",year=2012,plate="DWG4321")
     c.print_car_info()
-    d = Driver(first="Anuj",last="Shah",age=21,year=4,netID="anujs3",major="CS",phone=9144821633,address="63921 Arroyo Dr, Irvine CA 92617",car=c,zone=1)
-    d.print_user_info()
+    d1 = Driver(first="Jeremy",last="Yang",age=21,year=4,netID="jeremy2",major="CS",phone=7142532338,address="175 Amerherst Aisle, Irvine CA",car=c,zone=1)
+    d2 = Driver(first="Chris",last="Wong",age=21,year=4,netID="tvwong",major="CS",phone=1111111111,address="3 Rockview, Irvine CA, Irvine CA",car=c,zone=1)
+    r1 = Rider(first="Anuj",last="Shah",age=21,year=4,netID="anujs3",major="CS",phone=9144821633,address="8 Scripps Aisle, Irvine CA")
+    r2 = Rider(first="Jonathan",last="Nguyen",age=21,year=4,netID="jonatn8",major="CS",phone=2222222222,address="3 Rockview, Irvine CA")
+    drivers = [d1,d2]
+    riders = [r1,r2]
+    print(match_users(drivers,riders))
