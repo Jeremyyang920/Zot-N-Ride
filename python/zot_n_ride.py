@@ -4,6 +4,8 @@ import json
 import urllib.parse
 import urllib.request
 
+### CONSTANTS
+
 class User:
     def __init__(self, **kwargs):
         self.first_name = kwargs.get("first")
@@ -86,5 +88,5 @@ def get_json(url: str) -> dict:
 if __name__ == "__main__":
     c = Car(make="Hyundai",model="Sonata",year=2012,plate="DWG4321")
     c.print_car_info()
-    d = Driver(first="Anuj",last="Shah",age=21,netID="anujs3",major="CS",phone=9144821633,car=c)
+    d = Driver(first="Anuj",last="Shah",age=21,year=4,netID="anujs3",major="CS",phone=9144821633,address="Scripps Aisle; 92612",car=c,zone=1)
     d.print_user_info()
