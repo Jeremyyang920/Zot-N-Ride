@@ -5,6 +5,8 @@ import urllib.parse
 import urllib.request
 
 ### CONSTANTS
+UCI_PLACE_ID = ChIJkb-SJQ7e3IAR7LfattDF-3k
+GOOGLE_API_KEY = AIzaSyAk1S7XvdmV-WpxfzuA7wuyeMuQfFkO1qA
 
 class User:
     def __init__(self, **kwargs):
