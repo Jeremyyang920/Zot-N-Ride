@@ -5,8 +5,8 @@ import urllib.parse
 import urllib.request
 
 ### CONSTANTS
-UCI_PLACE_ID = ChIJkb-SJQ7e3IAR7LfattDF-3k
-GOOGLE_API_KEY = AIzaSyAk1S7XvdmV-WpxfzuA7wuyeMuQfFkO1qA
+UCI_PLACE_ID = 'ChIJkb-SJQ7e3IAR7LfattDF-3k'
+GOOGLE_API_KEY = 'AIzaSyAk1S7XvdmV-WpxfzuA7wuyeMuQfFkO1qA'
 
 class User:
     def __init__(self, **kwargs):
@@ -49,10 +49,13 @@ class User:
         return "({}) {}-{}".format(phone[0:3],phone[3:6],phone[6:])
 
     def calc_driving_distance(self):
-        pass
+        URL='https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=place_id:ChIJkb-SJQ7e3IAR7LfattDF-3k&destinations=2842+longspur+dr+Fullerton,CA&key=AIzaSyAk1S7XvdmV-WpxfzuA7wuyeMuQfFkO1qA'
+        jsonToRead=get_json(URL);
+
+        return(jsonToRead['rows'][0]['elements'][0]['duration']['value'])
 
     def print_user_info(self):
-        print("Full Name: {}\nAge: {}\nMajor: {}\nEmail: {}\nPhone: {}".format(self.full_name, self.age, self.major, self.email, self.display_phone()))
+        print("Full Name: {}\nAge: {}\nMajor: {}\nEmail: {}\nPhone: {}\nDistance: {}".format(self.full_name, self.age, self.major, self.email, self.display_phone(),self.distance_to_uci))
 
 class Car:
     def __init__(self, **kwargs):
@@ -80,12 +83,14 @@ class Driver(User):
         assert type(self.permit_zone) == int and self.permit_zone >= 1 and self.permit_zone <= 6
 
 def get_json(url: str) -> dict:
-    response = urllib.request.urlopen(url)
-    data = response.read()
-    json_text = data.decode(encoding = 'utf-8')
-    result = json.loads(json_text)
-    response.close()
-    return result
+    response = None
+    try:
+        response=urllib.request.urlopen(url)
+        return json.loads(response.read().decode(encoding='utf-8'))
+    finally:
+        if response != None:
+            response.close()
+
 
 if __name__ == "__main__":
     c = Car(make="Hyundai",model="Sonata",year=2012,plate="DWG4321")
