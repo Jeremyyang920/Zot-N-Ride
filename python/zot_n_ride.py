@@ -1,4 +1,3 @@
-import random
 from collections import defaultdict
 import json
 import urllib.parse
@@ -7,6 +6,7 @@ import urllib.request
 ### CONSTANTS
 UCI_PLACE_ID = 'ChIJkb-SJQ7e3IAR7LfattDF-3k'
 GOOGLE_API_KEY = 'AIzaSyAk1S7XvdmV-WpxfzuA7wuyeMuQfFkO1qA'
+BASE_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&'
 BUFFER_PICKUP_TIME = 5*60
 DAY_ABBREVIATIONS = ['MON','TUE','WED','THU','FRI','SAT','SUN']
 DEFAULT_ARRIVAL_TIME = '8:00'
@@ -102,11 +102,10 @@ class Driver(User):
         assert type(self.permit_zone) == int and self.permit_zone >= 1 and self.permit_zone <= 6
 
 def calc_driving_time(source: str, destination: str) -> int:
-    BASE_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&'
     query_parameters = [('origins',source), ('destinations',destination), ('key',GOOGLE_API_KEY)]
-    URL = BASE_URL + urllib.parse.urlencode(query_parameters)
-    jsonToRead = get_json(URL)
-    return jsonToRead['rows'][0]['elements'][0]['duration']['value']
+    url = BASE_URL + urllib.parse.urlencode(query_parameters)
+    json_to_read = get_json(url)
+    return json_to_read['rows'][0]['elements'][0]['duration']['value']
 
 def get_json(url: str) -> dict:
     response = None
