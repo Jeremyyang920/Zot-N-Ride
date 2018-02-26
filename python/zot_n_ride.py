@@ -31,6 +31,7 @@ class User:
         self.UCInetID = kwargs.get('netID','panteater')
         assert type(self.UCInetID) == str
         self.email = self.get_email()
+        self.password = kwarges.get('password')
 
         self.phone = self.parse_phone(kwargs.get('phone','111-111-1111'))
         assert type(self.phone) == int
