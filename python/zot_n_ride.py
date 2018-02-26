@@ -124,7 +124,7 @@ def match_users(drivers: [Driver], riders: [Rider]) -> dict:
             result[rider][driver] = delta_time
     return extract_matches(result)
 
-def extract_matches(input_dict) -> dict:
+def extract_matches(input_dict: dict) -> dict:
     result = dict()
     for k in input_dict:
         result[k] = min(input_dict[k].items(),key = lambda x: x[1])[0]
@@ -132,10 +132,9 @@ def extract_matches(input_dict) -> dict:
 
 if __name__ == '__main__':
     car = Car(make='Hyundai',model='Sonata',year=2012,plate='DWG4321')
-    driver1 = Driver(first='Jeremy',last='Yang',age=21,year=4,netID='jeremy2',major='CS',phone='7142532338',address='175 Amerherst Aisle, Irvine, CA',car=car,zone=1)
+    driver1 = Driver(first='Jeremy',last='Yang',age=21,year=4,netID='jeremy2',major='CS',phone='7142532338',address='140 Amherst Aisle, Irvine, CA',car=car,zone=1)
     driver2 = Driver(first='Chris',last='Wong',age=21,year=4,netID='tvwong',major='CS',phone='1111111111',address='3 Rockview, Irvine CA, Irvine, CA',car=car,zone=1)
-    rider1 = Rider(first='Anuj',last='Shah',age=21,year=4,netID='anujs3',major='CS',phone='914-482-1633',address='8 Scripps Aisle, Irvine, CA')
-    rider1.print_user_info()
+    rider1 = Rider(first='Anuj',last='Shah',age=21,year=4,netID='anujs3',major='CS',phone='914-482-1633',address='10 Marquette, Irvine, CA')
     rider2 = Rider(first='Jonathan',last='Nguyen',age=21,year=4,netID='jonatn8',major='CS',phone='2222222222',address='3 Rockview, Irvine, CA')
     drivers = [driver1,driver2]
     riders = [rider1,rider2]
