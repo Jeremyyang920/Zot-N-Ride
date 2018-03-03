@@ -5,12 +5,15 @@ import urllib.request
 import sendgrid
 import os
 from sendgrid.helpers.mail import *
+from authy.api import AuthyApiClient
 import api_keys
 
 ### CONSTANTS
 UCI_PLACE_ID = 'ChIJkb-SJQ7e3IAR7LfattDF-3k'
 GOOGLE_API_KEY = api_keys.GOOGLE_API_KEY
 SENDGRID_API_KEY = api_keys.SENDGRID_API_KEY
+TWILIO_API_KEY = api_keys.TWILIO_API_KEY
+TWILIO_ACCOUNT_SID = 'AC60fced5a65dc1155af935bd64edf7d77'
 BASE_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&'
 BUFFER_PICKUP_TIME = 5*60
 DAY_ABBREVIATIONS = ['MON','TUE','WED','THU','FRI','SAT','SUN']
@@ -71,7 +74,7 @@ class User:
 
     def display_phone(self) -> str:
         phone = str(self.phone)
-        return '({area_code}) {next_three_digits}-{last_four_digits}'.format(area_code=phone[0:3],next_three_digits=phone[3:6],last_four_digits=phone[6:])
+        return '{area_code}-{next_three_digits}-{last_four_digits}'.format(area_code=phone[0:3],next_three_digits=phone[3:6],last_four_digits=phone[6:])
 
     def calc_driving_time_to_uci(self) -> int:
         return calc_driving_time(self.address,'place_id:{}'.format(UCI_PLACE_ID))
@@ -145,6 +148,11 @@ def confirm_email(u: User):
     response = sg.client.mail.send.post(request_body=mail.get())
     print(response.status_code)
 
+def confirm_phone(u: User):
+    client = AuthyApiClient(TWILIO_API_KEY)
+    user = client.users.create(u.email,u.phone,1)
+    sms = client.users.request_sms(user.id)
+
 if __name__ == '__main__':
     car = Car(make='Hyundai',model='Sonata',year=2012,plate='DWG4321')
     driver1 = Driver(first='Jeremy',last='Yang',age=21,year=4,netID='jeremy2',major='CS',phone='7142532338',address='140 Amherst Aisle, Irvine, CA',car=car,zone=1)
@@ -154,4 +162,5 @@ if __name__ == '__main__':
     drivers = [driver1,driver2]
     riders = [rider1,rider2]
     print(match_users(drivers,riders))
-    confirm_email(rider1)    
+    confirm_email(rider1)
+    confirm_phone(rider1)
