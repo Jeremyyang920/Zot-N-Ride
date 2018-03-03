@@ -2,10 +2,15 @@ from collections import defaultdict
 import json
 import urllib.parse
 import urllib.request
+import sendgrid
+import os
+from sendgrid.helpers.mail import *
+import api_keys
 
 ### CONSTANTS
 UCI_PLACE_ID = 'ChIJkb-SJQ7e3IAR7LfattDF-3k'
-GOOGLE_API_KEY = 'AIzaSyAk1S7XvdmV-WpxfzuA7wuyeMuQfFkO1qA'
+GOOGLE_API_KEY = api_keys.GOOGLE_API_KEY
+SENDGRID_API_KEY = api_keys.SENDGRID_API_KEY
 BASE_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&'
 BUFFER_PICKUP_TIME = 5*60
 DAY_ABBREVIATIONS = ['MON','TUE','WED','THU','FRI','SAT','SUN']
@@ -130,6 +135,16 @@ def extract_matches(input_dict: dict) -> dict:
         result[k] = min(input_dict[k].items(),key = lambda x: x[1])[0]
     return result
 
+def confirm_email(u: User):
+    sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
+    from_email = Email('confirm_email@zotnride.io')
+    to_email = Email(u.email)
+    subject = 'Confirm Your Zot N\' Ride Account'
+    content = Content('text/plain', 'Click this link to verify your account: www.zotnride.io/confirm.')
+    mail = Mail(from_email, subject, to_email, content)
+    response = sg.client.mail.send.post(request_body=mail.get())
+    print(response.status_code)
+
 if __name__ == '__main__':
     car = Car(make='Hyundai',model='Sonata',year=2012,plate='DWG4321')
     driver1 = Driver(first='Jeremy',last='Yang',age=21,year=4,netID='jeremy2',major='CS',phone='7142532338',address='140 Amherst Aisle, Irvine, CA',car=car,zone=1)
@@ -139,3 +154,4 @@ if __name__ == '__main__':
     drivers = [driver1,driver2]
     riders = [rider1,rider2]
     print(match_users(drivers,riders))
+    confirm_email(rider1)    
