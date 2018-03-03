@@ -1,5 +1,7 @@
-python/__pycache__
+# Python
+*.pyc
 python/api_keys.py
+venv/
 
 # Logs
 logs

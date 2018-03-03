@@ -1,3 +1,4 @@
+from app import app
 from collections import defaultdict
 import json
 import urllib.parse
@@ -154,6 +155,7 @@ def confirm_phone(u: User):
     sms = client.users.request_sms(user.id)
 
 if __name__ == '__main__':
+    '''
     car = Car(make='Hyundai',model='Sonata',year=2012,plate='DWG4321')
     driver1 = Driver(first='Jeremy',last='Yang',age=21,year=4,netID='jeremy2',major='CS',phone='7142532338',address='140 Amherst Aisle, Irvine, CA',car=car,zone=1)
     driver2 = Driver(first='Chris',last='Wong',age=21,year=4,netID='tvwong',major='CS',phone='1111111111',address='3 Rockview, Irvine CA, Irvine, CA',car=car,zone=1)
@@ -164,3 +166,5 @@ if __name__ == '__main__':
     print(match_users(drivers,riders))
     confirm_email(rider1)
     confirm_phone(rider1)
+    '''
+    pass
