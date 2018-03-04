@@ -1,6 +1,6 @@
 # Python
 *.pyc
-python/api_keys.py
+python/confidential.py
 venv/
 
 # Logs

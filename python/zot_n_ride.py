@@ -1,4 +1,4 @@
-# from app import app
+from app import app
 from collections import defaultdict
 import json
 import urllib.parse
@@ -7,21 +7,24 @@ import sendgrid
 import os
 from sendgrid.helpers.mail import *
 from authy.api import AuthyApiClient
-import api_keys
+import confidential
 import logger
+from pymongo import MongoClient
 
 ### CONSTANTS
 UCI_PLACE_ID = 'ChIJkb-SJQ7e3IAR7LfattDF-3k'
-GOOGLE_API_KEY = api_keys.GOOGLE_API_KEY
-SENDGRID_API_KEY = api_keys.SENDGRID_API_KEY
-TWILIO_API_KEY = api_keys.TWILIO_API_KEY
-TWILIO_ACCOUNT_SID = 'AC60fced5a65dc1155af935bd64edf7d77'
+GOOGLE_API_KEY = confidential.GOOGLE_API_KEY
+SENDGRID_API_KEY = confidential.SENDGRID_API_KEY
+TWILIO_API_KEY = confidential.TWILIO_API_KEY
 BASE_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&'
 BUFFER_PICKUP_TIME = 5*60
 DAY_ABBREVIATIONS = ['MON','TUE','WED','THU','FRI','SAT','SUN']
 DEFAULT_ARRIVAL_TIME = '8:00'
 DEFAULT_DEPARTURE_TIME = '18:00'
 log = logger.configure_logger()
+client = MongoClient(confidential.MONGO_CLIENT_URI)
+db = client['test']
+users = db.users
 
 class User:
     def __init__(self, **kwargs):
@@ -127,13 +130,24 @@ def get_json(url: str) -> dict:
         if response != None:
             response.close()
 
-def match_users(drivers: [Driver], riders: [Rider]) -> dict:
+def match_users(riders: [Rider], drivers: [Driver]) -> dict:
     result = defaultdict(dict)
     for rider in riders:
         for driver in drivers:
             delta_time = (calc_driving_time(driver.address,rider.address) + rider.time_to_uci + BUFFER_PICKUP_TIME) - driver.time_to_uci
             result[rider][driver] = delta_time
     return extract_matches(result)
+
+def match_users_with_db(riders, drivers) -> dict:
+    result = defaultdict(dict)
+    for rider in riders:
+        for driver in drivers:
+            delta_time = (calc_driving_time(driver['address'],rider['address']) + rider['time_to_uci'] + BUFFER_PICKUP_TIME) - driver['time_to_uci']
+            rider_name = rider['name']['first'] + ' ' + rider['name']['last']
+            driver_name = driver['name']['first'] + ' ' + driver['name']['last']
+            result[rider_name][driver_name] = delta_time
+    return extract_matches(result)
+
 
 def extract_matches(input_dict: dict) -> dict:
     result = dict()
@@ -163,14 +177,24 @@ def confirm_phone(u: User):
     except:
         log.error('There was an issue making the Twilio API call. Please make sure that the phone number is valid with the correct country code.')
 
+def create_user_from_json(first_name: str, last_name: str):
+    user = users.find_one({'name':{'first':first_name,'last':last_name}})
+    if user['isDriver']:
+        return Driver(first=user['name']['first'],last=user['name']['last'],age=int(user['age']),year=int(user['year']),netID=user['netID'],major=user['major'],phone=user['phone'],address=user['address'],car=Car(),zone=1)
+    else:
+        return Rider(first=user['name']['first'],last=user['name']['last'],age=int(user['age']),year=int(user['year']),netID=user['netID'],major=user['major'],phone=user['phone'],address=user['address'])
+
+def load_all_users():
+    riders,drivers = [],[]
+    for user in users.find({}):
+        users.update_one({'_id':user['_id']}, {'$set': {'time_to_uci':calc_driving_time(user['address'],'place_id:{}'.format(UCI_PLACE_ID))}}, upsert=False)
+    for user in users.find({}):
+        if user['isDriver']:
+            drivers.append(user)
+        else:
+            riders.append(user)
+    return riders,drivers
+
 if __name__ == '__main__':
-    # car = Car(make='Hyundai',model='Sonata',year=2012,plate='DWG4321')
-    # driver1 = Driver(first='Jeremy',last='Yang',age=21,year=4,netID='jeremy2',major='CS',phone='7142532338',address='140 Amherst Aisle, Irvine, CA',car=car,zone=1)
-    #driver2 = Driver(first='Chris',last='Wong',age=21,year=4,netID='tvwong',major='CS',phone='1111111111',address='3 Rockview, Irvine CA, Irvine, CA',car=car,zone=1)
-    rider1 = Rider(first='Anuj',last='Shah',age=21,year=4,netID='anujs3',major='CS',phone='914-482-1633',address='10 Marquette, Irvine, CA')
-    # rider2 = Rider(first='Jonathan',last='Nguyen',age=21,year=4,netID='jonatn8',major='CS',phone='2222222222',address='3 Rockview, Irvine, CA')
-    # drivers = [driver1,driver2]
-    # riders = [rider1,rider2]
-    # print(match_users(drivers,riders))
-    confirm_email(rider1)
-    confirm_phone(rider1)
+    riders,drivers = load_all_users()
+    print(match_users_with_db(riders,drivers))
