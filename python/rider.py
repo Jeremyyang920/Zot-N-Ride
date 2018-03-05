@@ -1,4 +1,4 @@
-from user import User
+import user
 
-class Rider(User):
+class Rider(user.User):
     pass

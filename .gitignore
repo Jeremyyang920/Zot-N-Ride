@@ -1,6 +1,7 @@
 # Python
 *.pyc
 python/confidential.py
+.idea/
 venv/
 
 # Logs

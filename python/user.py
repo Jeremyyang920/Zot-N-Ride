@@ -1,3 +1,9 @@
+import maps
+
+DAY_ABBREVIATIONS = ['MON','TUE','WED','THU','FRI','SAT','SUN']
+DEFAULT_ARRIVAL_TIME = '8:00'
+DEFAULT_DEPARTURE_TIME = '18:00'
+
 class User:
     def __init__(self, **kwargs):
         self.first_name = kwargs.get('first','Peter')
@@ -28,7 +34,7 @@ class User:
         self.departure_list = kwargs.get('departures',[DEFAULT_DEPARTURE_TIME]*len(DAY_ABBREVIATIONS))
         self.departure_times = list(zip(DAY_ABBREVIATIONS,self.departure_list))
 
-        self.address = kwargs.get('address','place_id:{}'.format(UCI_PLACE_ID))
+        self.address = kwargs.get('address','place_id:{}'.format(maps.UCI_PLACE_ID))
         self.time_to_uci = self.calc_driving_time_to_uci()
 
     def __repr__(self):
@@ -55,7 +61,7 @@ class User:
         return '{area_code}-{next_three_digits}-{last_four_digits}'.format(area_code=phone[0:3],next_three_digits=phone[3:6],last_four_digits=phone[6:])
 
     def calc_driving_time_to_uci(self) -> int:
-        return calc_driving_time(self.address,'place_id:{}'.format(UCI_PLACE_ID))
+        return maps.calc_driving_time(self.address,'place_id:{}'.format(maps.UCI_PLACE_ID))
 
     def print_user_info(self):
         base_string = 'Full Name: {}\nAge: {}\nAcademic Year: {}\nMajor: {}\nEmail: {}\nPhone Number: {}\nAddress: {}'
