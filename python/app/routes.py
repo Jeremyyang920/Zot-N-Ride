@@ -1,6 +1,8 @@
 from app import app
 from flask import Flask,abort,request,Response
 import json
+from flask import jsonify
+
 import sys
 sys.path.append('/../')
 import zot_n_ride as ZNC
@@ -19,7 +21,8 @@ def display_profile(username):
 def register_user():
     if not request.json:
         abort(400)
-    test=ZNC.create_user_into_db(request.json['First'],request.json['Last'],request.json['Email'])
+    body=request.json
+    test=ZNC.create_user_into_db(body['netID'],body['password'],body['firstname'],body['lastname'],body['major'],body['address'],body['isDriver'])
     if(test == None):
-        return Response(json.dumps(request.json), status=201, mimetype='application/json')
+        return Response('User already exists',status=302)
     return json.dumps(request.json)
