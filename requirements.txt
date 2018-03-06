@@ -1,0 +1,8 @@
+authy==2.1.5
+Flask==0.12.2
+Flask-PyMongo==0.5.1
+googlemaps==2.5.1
+ics==0.3.1
+pymongo==3.6.1
+sendgrid==5.3.0
+twilio==5.4.0
