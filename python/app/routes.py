@@ -24,5 +24,5 @@ def register_user():
     body=request.json
     test=ZNC.create_user_into_db(body['netID'],body['password'],body['firstname'],body['lastname'],body['major'],body['address'],body['isDriver'])
     if(test == None):
-        return Response('User already exists',status=302)
+        abort(400)
     return json.dumps(request.json)
