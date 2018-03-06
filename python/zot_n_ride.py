@@ -85,6 +85,13 @@ def create_user_from_json(first_name: str, last_name: str):
     else:
         return rider.Rider(first=user['name']['first'],last=user['name']['last'],age=int(user['age']),year=int(user['year']),netID=user['netID'],major=user['major'],phone=user['phone'],address=user['address'])
 
+def create_user_into_db(first_name:str,last_name:str,email:str):
+    if(users.find_one({'Email':email}) != None):
+        print("User Exists")
+        return
+    user=users.insert_one({'name':{'first':first_name,'last':last_name},'email':email})
+    return users
+    
 if __name__ == '__main__':
     user = create_user_from_json('Anuj','Shah')
     confirm_email(user)
