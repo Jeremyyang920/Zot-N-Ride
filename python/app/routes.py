@@ -5,7 +5,7 @@ from flask import jsonify
 
 import sys
 sys.path.append('/../')
-import zot_n_ride as ZNC
+import zot_n_ride as ZNR
 
 @app.route('/')
 @app.route('/home')
@@ -22,7 +22,7 @@ def register_user():
     if not request.json:
         abort(400)
     body=request.json
-    test=ZNC.create_user_into_db(body['netID'],body['password'],body['firstname'],body['lastname'],body['major'],body['address'],body['isDriver'])
-    if(test == None):
+    query=ZNR.create_user_into_db(body['netID'],body['password'],body['firstname'],body['lastname'],body['major'],body['address'],body['isDriver'])
+    if(query == None):
         abort(400)
     return json.dumps(request.json)
