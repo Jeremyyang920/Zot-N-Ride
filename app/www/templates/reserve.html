@@ -1,0 +1,47 @@
+<ion-modal-view>
+  <ion-header-bar>
+    <h1 class="title">Reserve</h1>
+    <div class="buttons">
+      <button class="button button-clear button-stable" ng-click="closeReserve()"><i class="icon ion-close-round"></i></button>
+    </div>
+  </ion-header-bar>
+  <ion-content>
+    <div id="reserve">
+      <form>
+        <h3>Reserving {{ listingData.name }}</h3>
+        <div class="list list-inset main-list">
+          <label class="item item-input">
+            <i class="icon ion-calendar placeholder-icon"></i>
+            <input type="text" ng-click="setStartDate()" readonly placeholder="Start Date" ng-model="getStartDateTime">
+          </label>
+        </div>
+        <div class="list list-inset main-list">
+          <label class="item item-input">
+            <i class="icon ion-calendar placeholder-icon"></i>
+            <input type="text" ng-click="setEndDate()" readonly placeholder="End Date" ng-model="getEndDateTime">
+          </label>
+        </div>
+        <hr>
+        <h3>Confirm your details</h3>
+        <div class="list list-inset main-list">
+          <label class="item item-input">
+            <i class="icon ion-person placeholder-icon"></i>
+            <input type="text" placeholder="Peter Anteater" ng-model="userInfo.name">
+          </label>
+        </div>
+        <div class="list list-inset main-list">
+          <label class="item item-input">
+            <i class="icon ion-email placeholder-icon"></i>
+            <input type="text" placeholder="panteater@uci.edu" ng-model="userInfo.email">
+          </label>
+        </div>
+        <hr>
+        <h3>Order Summary</h3>
+        <h4>${{ listingData.price }}/hour x {{ getTotalTime() }} hours = ${{ getTotalPrice() }}</h4>
+      </form>
+    </div>
+  </ion-content>
+  <div ng-click="reserve()" class="bar bar-footer bar-balanced">
+    <div class="title"><i class="icon ion-pricetag"></i> Reserve for ${{ getTotalPrice() }}</div>
+  </div>
+</ion-modal-view>
