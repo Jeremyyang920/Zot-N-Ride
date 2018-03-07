@@ -17,7 +17,10 @@
           <input type="password" ng-model="loginData.password">
         </label>
         <label class="item">
-          <button class="button button-block button-positive" type="submit">Log in</button>
+          <button class="button button-block button-positive" type="submit">Log in</button>          
+        </label>
+        <label class="item">                
+          <button class="button button-block button-clear button-calm" ui-sref="app.registration"  ng-click="closeLogin()">Create an account here</button>
         </label>
       </div>
     </form>

@@ -1,8 +1,9 @@
 <ion-modal-view>
   <ion-header-bar>
     <h1 class="title">Reserve</h1>
-    <div class="buttons">
-      <button class="button button-clear button-stable" ng-click="closeReserve()"><i class="icon ion-close-round"></i></button>
+      <button class="button button-clear button-stable" ng-click="closeReserve()">
+        <i class="icon ion-close-round"></i>
+      </button>
     </div>
   </ion-header-bar>
   <ion-content>
@@ -42,6 +43,7 @@
     </div>
   </ion-content>
   <div ng-click="reserve()" class="bar bar-footer bar-balanced">
-    <div class="title"><i class="icon ion-pricetag"></i> Reserve for ${{ getTotalPrice() }}</div>
+    <div class="title">
+      <i class="icon ion-pricetag"></i> Reserve for ${{ getTotalPrice() }}</div>
   </div>
 </ion-modal-view>

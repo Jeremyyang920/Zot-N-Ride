@@ -1,35 +1,55 @@
 <ion-view view-title="Zot-N-Ride">
 	<ion-content>
-		<div class="list list-inset main-list">
-			<label class="item item-input">
-				<i class="icon ion-search placeholder-icon"></i>
-				<input type="text" placeholder="Search for Locations" value="{{ currentLocation }}">
-			</label>
-		</div>
-		<div class="list list-inset main-list">
-			<label class="item item-input">
-				<i class="icon ion-calendar placeholder-icon"></i>
-				<input type="text" ng-click="setStartDate()" readonly placeholder="Start Date" ng-model="getStartDateTime">
-			</label>
-		</div>
-		<div class="list list-inset main-list">
+		<div class="list card">
+			<li class="item item-toggle">
+				Arriving				
+				<label class="toggle toggle-balanced">
+				<input type="checkbox">
+				<div class="track">
+					<div class="handle"></div>
+				</div>
+			</li>
 			<label class="item item-input">
 				<i class="icon ion-calendar placeholder-icon"></i>
-				<input type="text" ng-click="setEndDate()" readonly placeholder="End Date" ng-model="getEndDateTime">
+				<input type="datetime" placeholder="Arrival time" ng-model="arrivalTime">
+			</label>
+			<label class="item item-input item-select">
+				<i class="icon ion-location placeholder-icon"></i>
+				<div class="input-select">
+					Location
+				</div>
+				<select> 
+					<option selected>Home 1</option>
+					<option>Home 2</option>
+				</select>
+				</label>
 			</label>
 		</div>
-		<div class="list card" ng-repeat="x in listing">
-			<a href="#/app/listing/{{ x.rid }}" class="item item-image">
-				<img src="{{ x.photo }}">
-			</a>
-			<div class="item">
-				<h2>{{ x.name }}</h2>
-				<p>{{ x.description }}</p>
-			</div>
-			<a class="item item-icon-left assertive" href="#">
-				<i class="icon ion-pricetag"></i>
-				Reserve for ${{ x.price }}/day
-			</a>
+		<div class="list card">
+			<li class="item item-toggle">
+				Leaving				
+				<label class="toggle toggle-balanced">
+				<input type="checkbox">
+				<div class="track">
+					<div class="handle"></div>
+				</div>
+			</li>
+			<label class="item item-input">
+				<i class="icon ion-calendar placeholder-icon"></i>
+				<input type="datetime" placeholder="Leaving time" ng-model="leaveTime">
+			</label>
+			<label class="item item-input item-select">
+				<i class="icon ion-location placeholder-icon"></i>
+				<div class="input-select">
+					Location
+				</div>
+				<select> 
+					<option selected>Parking zone 1</option>
+					<option>Parking zone 2</option>
+					<option>Parking zone 3</option>
+				</select>
+				</label>
+			</label>
 		</div>
 	</ion-content>
 </ion-view>

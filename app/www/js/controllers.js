@@ -11,17 +11,19 @@ angular.module('zotnride.controllers', [])
 
   // Form data for the login modal
   $scope.loginData = {};
+  
 
   $ionicModal.fromTemplateUrl('templates/login.html', {
     scope: $scope,
     animation: 'slide-in-up'
   }).then(function(modal) {
     $scope.loginModal = modal;
+    $scope.loginModal.show();
   });
 
   $scope.closeLogin = function() {
     $scope.loginModal.hide();
-    if ($ionicHistory.currentView().title === 'Reservations')
+    if ($ionicHistory.currentView().title === 'Registration')
       $ionicHistory.backView().go();
   };
 
@@ -133,8 +135,22 @@ angular.module('zotnride.controllers', [])
   });
 })
 
-.controller('ReservationsCtrl', function($scope, $stateParams, $http) {
+.controller('RegistrationCtrl', function($scope, $stateParams, $http) {
+  $scope.registrationData = {};
+
+  $scope.registerAccount = function() {
   
+  }
+})
+
+.controller('UploadCtrl', function($scope, $stateParams, $rootScope, $ionicHistory) {
+  $scope.goHome = function(){
+    $ionicHistory.goBack(-2);
+  }
+  
+  $scope.uploadSchedule = function() {
+    $scope.goHome();
+  }
 })
 
 .controller('ListingCtrl', function($scope, $stateParams, $rootScope, $http, $ionicModal) {

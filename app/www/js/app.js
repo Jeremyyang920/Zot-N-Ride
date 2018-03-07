@@ -1,4 +1,4 @@
-angular.module('zotnride', ['ionic', 'zotnride.controllers', 'ngCordova'])
+angular.module('zotnride', ['ionic', 'zotnride.controllers', 'ngCordova', 'thatisuday.dropzone'])
 
 .run(function($ionicPlatform, $ionicHistory) {
   $ionicPlatform.ready(function() {
@@ -45,12 +45,22 @@ angular.module('zotnride', ['ionic', 'zotnride.controllers', 'ngCordova'])
     }
   })
 
-  .state('app.reservations', {
-    url: '/reservations',
+  .state('app.registration', {
+    url: '/registration',
     views: {
       'menuContent': {
-        templateUrl: 'templates/reservations.html',
-        controller: 'ReservationsCtrl'
+        templateUrl: 'templates/registration.html',
+        controller: 'RegistrationCtrl'
+      }
+    }
+  })
+
+  .state('app.upload', {
+    url: '/upload',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/upload.html',
+        controller: 'UploadCtrl'
       }
     }
   })

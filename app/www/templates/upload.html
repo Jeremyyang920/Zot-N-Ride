@@ -1,0 +1,12 @@
+<ion-view view-title="Upload your schedule">
+    <ion-content>
+        <p>Upload your schedules .ical file from EEE to automatically match with other users.</p>
+        <form action="/file-upload" class="dropzone dz-clickable" id="ical-dropzone">
+            <div class="fallback">
+                <input name="file" type="file" multiple />
+            </div>
+        </form>
+        <button class="button button-block button-positive" type="submit" ng-click="uploadSchedule()">Upload</button>
+        <button class="button button-clear icon-right ion-chevron-right button-dark" ng-click="goHome()">Skip</button>                              
+    </ion-content>
+</ion-view>
