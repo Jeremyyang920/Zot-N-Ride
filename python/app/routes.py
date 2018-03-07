@@ -26,3 +26,10 @@ def register_user():
     if(query == None):
         abort(400)
     return json.dumps(request.json)
+
+@app.route('/api/login',methods=['POST'])
+def login_user():
+    if not request.json:
+        abort(400)
+    body=request.json
+    
