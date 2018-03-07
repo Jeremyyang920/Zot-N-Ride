@@ -6,3 +6,4 @@ ics==0.3.1
 pymongo==3.6.1
 sendgrid==5.3.0
 twilio==5.4.0
+bcrypt==3.1.4
