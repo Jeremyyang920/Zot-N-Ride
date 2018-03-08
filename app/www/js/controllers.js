@@ -144,6 +144,10 @@ angular.module('zotnride.controllers', [])
 })
 
 .controller('UploadCtrl', function($scope, $stateParams, $rootScope, $ionicHistory) {
+  if (document.getElementById('DropzoneElementId')) {
+    var myDropzone = new Dropzone("div#ical-dropzone", { url: "/file/post"});
+  }
+
   $scope.goHome = function(){
     $ionicHistory.goBack(-2);
   }
