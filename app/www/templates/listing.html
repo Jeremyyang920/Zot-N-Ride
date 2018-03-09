@@ -1,0 +1,18 @@
+<ion-view view-title="Listing">
+	<ion-content>
+		<div class="item item-image">
+			<img src="{{ listingData.photo }}">
+		</div>
+		<div class="listing-details">
+			<h3>{{ listingData.name }}</h3>
+			<p>{{ listingData.description }}</p>
+			<hr>
+			<h4>Amenities</h4>
+			<div><i class="icon ion-ios-people"></i> 1 – {{ listingData.capacity }} people</div>
+			<div ng-repeat="x in amenities"><i class="icon {{ x.icon }}"></i> {{ x.name }}</div>
+		</div>
+	</ion-content>
+	<div ng-click="showReserve()" class="bar bar-footer bar-balanced">
+		<div class="title"><i class="icon ion-pricetag"></i> Reserve for ${{ listingData.price }}/day</div>
+	</div>
+</ion-view>
