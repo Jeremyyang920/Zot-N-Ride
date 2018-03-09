@@ -139,14 +139,14 @@ angular.module('zotnride.controllers', [])
   $scope.registrationData = {};
 
   $scope.registerAccount = function() {
-  
+
   }
 })
 
-.controller('UploadCtrl', function($scope, $stateParams, $rootScope, $ionicHistory) {
-  if (document.getElementById('DropzoneElementId')) {
-    var myDropzone = new Dropzone("div#ical-dropzone", { url: "/file/post"});
-  }
+.controller('UploadCtrl', function($scope, $stateParams, $rootScope, $ionicPlatform, $ionicHistory) {
+  $ionicPlatform.ready(function() {
+    var myDropzone = new Dropzone("#ical-dropzone", { url: "/file/post"});
+  });
 
   $scope.goHome = function(){
     $ionicHistory.goBack(-2);
