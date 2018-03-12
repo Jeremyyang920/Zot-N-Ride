@@ -26,10 +26,12 @@ def match_users_with_db(riders, drivers) -> dict:
     result = defaultdict(dict)
     for rider in riders:
         for driver in drivers:
-            delta_time = (maps.calc_driving_time(driver['address'],rider['address']) + rider['time_to_uci'] + BUFFER_PICKUP_TIME) - driver['time_to_uci']
+            delta_distance = abs((maps.calc_driving_time(driver['address'],rider['address']) + rider['time_to_uci'] + BUFFER_PICKUP_TIME) - driver['time_to_uci'])
+            delta_arrival = abs(rider['arrivals']['Thu'] - driver['arrivals']['Thu'])
+            delta_departure = abs(rider['departures']['Thu'] - driver['departures']['Thu'])
             rider_name = rider['name']['first'] + ' ' + rider['name']['last']
             driver_name = driver['name']['first'] + ' ' + driver['name']['last']
-            result[rider_name][driver_name] = delta_time
+            result[rider_name][driver_name] = delta_distance + delta_arrival + delta_departure
     return extract_matches(result)
 
 def match_users_with_classes(riders: [rider.Rider], drivers: [driver.Driver]) -> dict:
@@ -102,8 +104,5 @@ def validate_login(email:str,password:str):
     return match
     
 if __name__ == '__main__':
-    user = create_user_from_json('Anuj','Shah')
-    confirm_email(user)
-    confirm_phone(user)
     riders,drivers = load_all_users()
     print(match_users_with_db(riders,drivers))
