@@ -1,4 +1,3 @@
-from app import app
 from flask import Flask,abort,request,Response
 import json
 from flask import jsonify
