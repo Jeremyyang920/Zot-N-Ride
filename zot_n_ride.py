@@ -96,8 +96,8 @@ def create_user_into_db(netID:str,password:str,first_name:str,last_name:str,majo
     log.info("User successfully created.")
     return users
 
-def validate_login(email:str,password:str):
-    match= bcrypt.checkpw(password.encode('utf-8'),users.find_one({'email':email})['password'])
+def validate_login(netID:str,password:str):
+    match= bcrypt.checkpw(password.encode('utf-8'),users.find_one({'netID':netID})['password'])
     if(not match):
         log.error("Password does not match")
     log.info("User successfully validated")
