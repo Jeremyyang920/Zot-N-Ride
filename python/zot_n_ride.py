@@ -11,11 +11,13 @@ import user
 import rider
 import driver
 import bcrypt
+import datetime
 
 SENDGRID_API_KEY = confidential.SENDGRID_API_KEY
 TWILIO_API_KEY = confidential.TWILIO_API_KEY
 BASE_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&'
 BUFFER_PICKUP_TIME = 5*60
+DAYS_OF_WEEK = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
 log = logger.configure_logger()
 client = MongoClient(confidential.MONGO_CLIENT_URI)
@@ -23,12 +25,13 @@ db = client['test']
 users = db.users
 
 def match_users_with_db(riders, drivers) -> dict:
+    tomorrow = DAYS_OF_WEEK[(datetime.datetime.today().weekday()+1)%len(DAYS_OF_WEEK)]
     result = defaultdict(dict)
     for rider in riders:
         for driver in drivers:
             delta_distance = abs((maps.calc_driving_time(driver['address'],rider['address']) + rider['time_to_uci'] + BUFFER_PICKUP_TIME) - driver['time_to_uci'])
-            delta_arrival = abs(rider['arrivals']['Thu'] - driver['arrivals']['Thu'])
-            delta_departure = abs(rider['departures']['Thu'] - driver['departures']['Thu'])
+            delta_arrival = abs(rider['arrivals'][tomorrow] - driver['arrivals'][tomorrow])
+            delta_departure = abs(rider['departures'][tomorrow] - driver['departures'][tomorrow])
             rider_name = rider['name']['first'] + ' ' + rider['name']['last']
             driver_name = driver['name']['first'] + ' ' + driver['name']['last']
             result[rider_name][driver_name] = delta_distance + delta_arrival + delta_departure
@@ -90,17 +93,17 @@ def create_user_from_json(first_name: str, last_name: str):
 
 def create_user_into_db(netID:str,password:str,first_name:str,last_name:str,major:str,address:str,isDriver:bool):
     if(users.find_one({'netID':netID}) != None):
-        log.error("User already exists.'")
+        log.error('User already exists.')
         return
     user=users.insert_one({'netID':netID,'password':password,'name':{'first':first_name,'last':last_name},'major':major,'address':address,'isDriver':isDriver})
-    log.info("User successfully created.")
+    log.info('User successfully created.')
     return users
 
-def validate_login(email:str,password:str):
-    match= bcrypt.checkpw(password.encode('utf-8'),users.find_one({'email':email})['password'])
-    if(not match):
-        log.error("Password does not match")
-    log.info("User successfully validated")
+def validate_login(email:str, password:str):
+    match = bcrypt.checkpw(password.encode('utf-8'),users.find_one({'email':email})['password'])
+    if not match:
+        log.error('Password does not match.')
+    log.info('User successfully validated.')
     return match
     
 if __name__ == '__main__':
