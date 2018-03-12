@@ -25,7 +25,7 @@ def register_user():
         abort(400)
     body=request.json
     hashedPW=bcrypt.hashpw(body['password'].encode('utf-8'),bcrypt.gensalt(12))
-    query=ZNR.create_user_into_db(body['email'],hashedPW,body['firstname'],body['lastname'],body['major'],body['address'],body['isDriver'])
+    query=ZNR.create_user_into_db(body['netID'],hashedPW,body['firstname'],body['lastname'],body['major'],body['address'],body['isDriver'])
     if(query == None):
         abort(400)
     return json.dumps(request.json)
