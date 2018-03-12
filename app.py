@@ -2,6 +2,7 @@ from flask import Flask,abort,request,Response
 import json
 from flask import jsonify
 from flask import Flask
+from flask_cors import CORS
 from flask_pymongo import PyMongo
 
 app = Flask(__name__)
@@ -9,6 +10,8 @@ app = Flask(__name__)
 import sys
 import zot_n_ride as ZNR
 import bcrypt
+
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 @app.route('/')
 @app.route('/home')
