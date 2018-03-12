@@ -11,11 +11,13 @@ import rider
 import driver
 import bcrypt
 from os import environ
+import datetime
 
 SENDGRID_API_KEY = environ.get('SENDGRID_API_KEY')
 TWILIO_API_KEY = environ.get('TWILIO_API_KEY')
 BASE_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&'
 BUFFER_PICKUP_TIME = 5*60
+DAYS_OF_WEEK = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
 log = logger.configure_logger()
 client = MongoClient(environ.get('MONGO_CLIENT_URI'))
@@ -23,12 +25,13 @@ db = client['test']
 users = db.users
 
 def match_users_with_db(riders, drivers) -> dict:
+    tomorrow = DAYS_OF_WEEK[(datetime.datetime.today().weekday()+1)%len(DAYS_OF_WEEK)]
     result = defaultdict(dict)
     for rider in riders:
         for driver in drivers:
             delta_distance = abs((maps.calc_driving_time(driver['address'],rider['address']) + rider['time_to_uci'] + BUFFER_PICKUP_TIME) - driver['time_to_uci'])
-            delta_arrival = abs(rider['arrivals']['Thu'] - driver['arrivals']['Thu'])
-            delta_departure = abs(rider['departures']['Thu'] - driver['departures']['Thu'])
+            delta_arrival = abs(rider['arrivals'][tomorrow] - driver['arrivals'][tomorrow])
+            delta_departure = abs(rider['departures'][tomorrow] - driver['departures'][tomorrow])
             rider_name = rider['name']['first'] + ' ' + rider['name']['last']
             driver_name = driver['name']['first'] + ' ' + driver['name']['last']
             result[rider_name][driver_name] = delta_distance + delta_arrival + delta_departure
