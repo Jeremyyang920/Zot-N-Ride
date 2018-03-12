@@ -1,10 +1,10 @@
 # Python
 *.pyc
-python/confidential.py
 .idea/
 venv/
 
-#env
+# Environment
+env
 *.env
 
 # Logs
