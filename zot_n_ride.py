@@ -5,20 +5,20 @@ from sendgrid.helpers.mail import *
 from authy.api import AuthyApiClient
 from pymongo import MongoClient
 import logger
-import confidential
 import maps
 import user
 import rider
 import driver
 import bcrypt
+from os import environ
 
-SENDGRID_API_KEY = confidential.SENDGRID_API_KEY
-TWILIO_API_KEY = confidential.TWILIO_API_KEY
+SENDGRID_API_KEY = environ.get('SENDGRID_API_KEY')
+TWILIO_API_KEY = environ.get('TWILIO_API_KEY')
 BASE_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&'
 BUFFER_PICKUP_TIME = 5*60
 
 log = logger.configure_logger()
-client = MongoClient(confidential.MONGO_CLIENT_URI)
+client = MongoClient(environ.get('MONGO_CLIENT_URI'))
 db = client['test']
 users = db.users
 

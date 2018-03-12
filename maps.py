@@ -1,11 +1,11 @@
 import json
 import urllib.parse
 import urllib.request
-from confidential import GOOGLE_API_KEY
+from os import environ
 
 UCI_PLACE_ID = 'ChIJkb-SJQ7e3IAR7LfattDF-3k'
 BASE_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&'
-
+GOOGLE_API_KEY = environ.get('GOOGLE_API_KEY')
 def calc_driving_time(source: str, destination: str) -> int:
     query_parameters = [('origins',source), ('destinations',destination), ('key',GOOGLE_API_KEY)]
     url = BASE_URL + urllib.parse.urlencode(query_parameters)

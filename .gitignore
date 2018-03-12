@@ -4,6 +4,9 @@ python/confidential.py
 .idea/
 venv/
 
+#env
+*.env
+
 # Logs
 logs
 *.log
