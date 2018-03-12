@@ -2,7 +2,7 @@
 	<ion-content>
 		<div class="list card">
 			<li class="item item-toggle">
-				Arriving				
+				Arrive By				
 				<label class="toggle toggle-balanced">
 				<input type="checkbox">
 				<div class="track">
@@ -11,7 +11,7 @@
 			</li>
 			<label class="item item-input">
 				<i class="icon ion-calendar placeholder-icon"></i>
-				<input type="datetime" placeholder="Arrival time" ng-model="arrivalTime">
+				<input type="text" ng-click="setStartDate()" readonly placeholder="Class Time" ng-model="getStartDateTime">
 			</label>
 			<label class="item item-input item-select">
 				<i class="icon ion-location placeholder-icon"></i>
@@ -27,7 +27,7 @@
 		</div>
 		<div class="list card">
 			<li class="item item-toggle">
-				Leaving				
+				Leave By			
 				<label class="toggle toggle-balanced">
 				<input type="checkbox">
 				<div class="track">
@@ -36,7 +36,7 @@
 			</li>
 			<label class="item item-input">
 				<i class="icon ion-calendar placeholder-icon"></i>
-				<input type="datetime" placeholder="Leaving time" ng-model="leaveTime">
+				<input type="text" ng-click="setEndDate()" readonly placeholder="Departure time" ng-model="getEndDateTime">
 			</label>
 			<label class="item item-input item-select">
 				<i class="icon ion-location placeholder-icon"></i>
