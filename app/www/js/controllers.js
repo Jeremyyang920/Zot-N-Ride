@@ -63,7 +63,7 @@ angular.module('zotnride.controllers', [])
       },
       headers: {'Content-Type': 'application/json'}
     }).then(function successCallback(response) {
-      if (response.data === '400') {
+      if (response.status === 400) {
         $scope.showLoginFailedAlert = function() {
           var alertPopup = $ionicPopup.alert({
             title: 'Login Failed',
