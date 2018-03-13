@@ -49,6 +49,9 @@ def login_user():
 # Endpoint for User Profile
 @app.route('/api/<netID>')
 def display_user(netID):
+    if not request.json:
+        abort(400)
+    body = request.json
     query = ZNR.get_user(body['netID'])
     return get_user_json(query)
 
