@@ -23,7 +23,7 @@ def welcome():
 def display_profile(username):
     return 'User {}'.format(username)
 
-#Endpoint for Creating a User
+# Endpoint for Creating a User
 @app.route('/api/register',methods=['POST'])
 def register_user():
     if not request.json:
@@ -33,9 +33,9 @@ def register_user():
     query = ZNR.create_user_into_db(body['netID'],hashedPW,body['firstname'],body['lastname'],body['major'],body['address'],body['isDriver'])
     if query == None:
         abort(400)
-    return query
+    return get_user_json(query)
 
-#Endpoint for Validating a Login
+# Endpoint for Validating a Login
 @app.route('/api/login',methods=['POST'])
 def login_user():
     if not request.json:
@@ -44,5 +44,16 @@ def login_user():
     query = ZNR.validate_login(body['netID'],body['password'])
     if not query:
         abort(400)
-    return query
-    
+    return get_user_json(query)
+
+# Endpoint for User Profile
+@app.route('/api/<netID>')
+def display_user(netID):
+    query = ZNR.get_user(body['netID'])
+    return get_user_json(query)
+
+def get_user_json(query):
+    return_value = query.copy()
+    del return_value['_id']
+    del return_value['password']
+    return json.dumps(return_value)
