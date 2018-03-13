@@ -33,7 +33,7 @@ def register_user():
     query = ZNR.create_user_into_db(body['netID'],hashedPW,body['firstname'],body['lastname'],body['major'],body['address'],body['isDriver'])
     if query == None:
         abort(400)
-    return json.dumps(query)
+    return query
 
 #Endpoint for Validating a Login
 @app.route('/api/login',methods=['POST'])
@@ -44,5 +44,5 @@ def login_user():
     query = ZNR.validate_login(body['netID'],body['password'])
     if not query:
         abort(400)
-    return json.dumps(query)
+    return query
     
