@@ -93,7 +93,7 @@ def create_user_from_json(first_name: str, last_name: str):
 
 def create_user_into_db(netID:str,password:str,first_name:str,last_name:str,major:str,address:str,isDriver:bool):
     if users.find_one({'netID':netID}) != None:
-        log.error("User already exists.'")
+        log.error("User already exists.")
         return
     user = users.insert_one({'netID':netID,'password':password,'name':{'first':first_name,'last':last_name},'major':major,'address':address,'isDriver':isDriver})
     log.info("User successfully created.")
