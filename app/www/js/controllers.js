@@ -14,6 +14,15 @@ angular.module('zotnride.controllers', [])
   // Form data for the login modal
   $scope.loginData = {};
   
+  // var startDateTime = new Date(new Date(new Date(new Date().setHours(new Date().getHours() + 1)).setMinutes(0)).setSeconds(0));
+  var startDateTime = moment();
+  $scope.startDateTime = startDateTime.add(1, 'hours').minute(0);
+  $scope.startDateTime = startDateTime.format('h:mm a');
+  // var endDateTime = new Date(new Date(new Date(new Date().setHours(new Date().getHours() + 2)).setMinutes(0)).setSeconds(0));
+  var endDateTime = moment().add(3, 'hours').minute(0);
+  $scope.endDateTime = endDateTime.format('h:mm a');
+  $scope.getStartDateTime = $scope.startDateTime;
+  $scope.getEndDateTime =  $scope.endDateTime;
 
   $ionicModal.fromTemplateUrl('templates/login.html', {
     scope: $scope,
@@ -81,6 +90,36 @@ angular.module('zotnride.controllers', [])
     });
   };
 
+  $scope.setStartDate = function() { $cordovaDatePicker.show({
+      date: $scope.startDateTime,
+      mode: 'time',
+      minDate: $scope.startDateTime,
+      allowOldDates: false,
+      minuteInterval: 30
+    }).then(function(datetime) {
+      $scope.startDateTime = datetime.toLocaleTimeString();
+      $scope.getStartDateTime = 'From: ' + $scope.startDateTime;
+      endDateTime = new Date(new Date(new Date(new Date($scope.startDateTime).setHours(new Date($scope.startDateTime).getHours() + 1)).setMinutes(0)).setSeconds(0));
+      $scope.endDateTime = endDateTime.toLocaleTimeString();
+      $scope.getEndDateTime = 'To: ' + $scope.endDateTime;
+      searchListings();
+    });
+  }
+
+  $scope.setEndDate = function() {
+    $cordovaDatePicker.show({
+      date: $scope.endDateTime,
+      mode: 'time',
+      minDate: $scope.startDateTime,
+      allowOldDates: false,
+      minuteInterval: 30
+    }).then(function(datetime) {
+      $scope.endDateTime = datetime.toLocaleTimeString();
+      $scope.getEndDateTime = 'To: ' + $scope.endDateTime;
+      searchListings();
+    });
+  }
+
   $ionicPlatform.ready(function() {
     // Get device location
     $cordovaGeolocation.getCurrentPosition({
@@ -130,14 +169,14 @@ angular.module('zotnride.controllers', [])
   $scope.registrationData = {};
 
   $scope.registerAccount = function() {
-
+  
   }
 })
 
-.controller('UploadCtrl', function($scope, $stateParams, $rootScope, $ionicPlatform, $ionicHistory) {
-  $ionicPlatform.ready(function() {
-    var myDropzone = new Dropzone("#ical-dropzone", { url: "/file/post"});
-  });
+.controller('UploadCtrl', function($scope, $stateParams, $rootScope, $ionicHistory) {
+  if (document.getElementById('DropzoneElementId')) {
+    var myDropzone = new Dropzone("div#ical-dropzone", { url: "/file/post"});
+  }
 
   $scope.goHome = function(){
     $ionicHistory.goBack(-2);
