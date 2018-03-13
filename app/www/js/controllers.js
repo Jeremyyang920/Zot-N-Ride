@@ -1,3 +1,5 @@
+API_URL = 'https://zot-n-ride.herokuapp.com';
+
 angular.module('zotnride.controllers', [])
 
 .controller('AppCtrl', function($scope, $ionicModal, $rootScope, $timeout, $ionicHistory, $ionicPlatform, $ionicPopup, $http, $cordovaGeolocation, $cordovaDatePicker) {
@@ -56,18 +58,12 @@ angular.module('zotnride.controllers', [])
       method: 'POST',
       url: API_URL + '/api/login',
       data: {
-        email: $scope.loginData.email,
+        netID: $scope.loginData.email,
         password: $scope.loginData.password
       },
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      transformRequest: function(obj) {
-        var str = [];
-        for(var p in obj)
-        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-        return str.join("&");
-      }
+      headers: {'Content-Type': 'application/json'}
     }).then(function successCallback(response) {
-      if (response.data === '') {
+      if (response.status === 400) {
         $scope.showLoginFailedAlert = function() {
           var alertPopup = $ionicPopup.alert({
             title: 'Login Failed',
@@ -77,13 +73,8 @@ angular.module('zotnride.controllers', [])
 
         $scope.showLoginFailedAlert();
       } else {
-        window.localStorage.setItem('uid', response.data.uid);
-        window.localStorage.setItem('first_name', response.data.first_name);
-        window.localStorage.setItem('last_name', response.data.last_name);
-        $scope.loadReservations();
+        window.localStorage.setItem('netID', response.data.netID);
         $scope.loginModal.hide();
-        if ($ionicHistory.currentView().title === 'Listing')
-          $scope.showReserve();
       }
     }, function errorCallback(response) {
       console.log(JSON.stringify(response));
