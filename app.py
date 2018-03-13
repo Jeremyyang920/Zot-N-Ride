@@ -23,26 +23,26 @@ def welcome():
 def display_profile(username):
     return 'User {}'.format(username)
 
-#Endpoint for creating a user
+#Endpoint for Creating a User
 @app.route('/api/register',methods=['POST'])
 def register_user():
     if not request.json:
         abort(400)
-    body=request.json
-    hashedPW=bcrypt.hashpw(body['password'].encode('utf-8'),bcrypt.gensalt(12))
-    query=ZNR.create_user_into_db(body['netID'],hashedPW,body['firstname'],body['lastname'],body['major'],body['address'],body['isDriver'])
-    if(query == None):
+    body = request.json
+    hashedPW = bcrypt.hashpw(body['password'].encode('utf-8'),bcrypt.gensalt(12))
+    query = ZNR.create_user_into_db(body['netID'],hashedPW,body['firstname'],body['lastname'],body['major'],body['address'],body['isDriver'])
+    if query == None:
         abort(400)
-    return json.dumps(request.json)
+    return json.dumps(query)
 
-#Endpoint for validating a login
+#Endpoint for Validating a Login
 @app.route('/api/login',methods=['POST'])
 def login_user():
     if not request.json:
         abort(400)
-    body=request.json
-    query=ZNR.validate_login(body['netID'],body['password'])
-    if(not query):
+    body = request.json
+    query = ZNR.validate_login(body['netID'],body['password'])
+    if not query:
         abort(400)
-    return json.dumps(request.json)
+    return json.dumps(query)
     
