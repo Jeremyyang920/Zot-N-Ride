@@ -97,14 +97,14 @@ def create_user_into_db(netID:str,password:str,first_name:str,last_name:str,majo
         return
     user = users.insert_one({'netID':netID,'password':password,'name':{'first':first_name,'last':last_name},'major':major,'address':address,'isDriver':isDriver})
     log.info('User successfully created.')
-    return get_user(json)
+    return get_user(netID)
 
 def validate_login(netID:str,password:str):
     match = bcrypt.checkpw(password.encode('utf-8'),users.find_one({'netID':netID})['password'])
     if not match:
         log.error('Password does not match.')
     log.info('User successfully validated.')
-    return get_user(json)
+    return get_user(netID)
 
 def get_user(netID:str):
     return users.find_one({'netID':netID})
