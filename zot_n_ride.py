@@ -103,6 +103,7 @@ def validate_login(netID:str,password:str):
     match = bcrypt.checkpw(password.encode('utf-8'),users.find_one({'netID':netID})['password'])
     if not match:
         log.error('Password does not match.')
+        return False
     log.info('User successfully validated.')
     return get_user(netID)
 
