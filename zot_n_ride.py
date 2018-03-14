@@ -78,10 +78,11 @@ def load_all_users():
     for user in users.find({}):
         users.update_one({'_id':user['_id']}, {'$set': {'time_to_uci':maps.calc_driving_time(user['address'],'place_id:{}'.format(maps.UCI_PLACE_ID))}}, upsert=False)
     for user in users.find({}):
-        if user['isDriver']:
-            drivers.append(user)
-        else:
-            riders.append(user)
+        if 'arrivals' in user and 'departures' in user:
+            if user['isDriver']:
+                drivers.append(user)
+            else:
+                riders.append(user)
     return riders,drivers
 
 def create_user_from_json(first_name: str, last_name: str):
@@ -112,7 +113,15 @@ def validate_login(netID:str,password:str):
 
 def get_user(netID:str):
     return users.find_one({'netID':netID})
-    
+
+def update_user_times(netID:str,arrivals:dict,departures:dict):
+    user = users.find_one({'netID':netID})
+    for k,v in arrivals.items():
+        users.update_one({'_id':user['_id']}, {'$set': {'arrivals.'+k:v}}, upsert=False)
+    for k,v in departures.items():
+        users.update_one({'_id':user['_id']}, {'$set': {'departures.'+k:v}}, upsert=False)
+    return user
+
 if __name__ == '__main__':
     riders,drivers = load_all_users()
     print(match_users_with_db(riders,drivers))
