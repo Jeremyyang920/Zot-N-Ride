@@ -1,0 +1,55 @@
+<ion-view view-title="Zot-N-Ride">
+	<ion-content>
+		<div class="list card">
+			<li class="item item-toggle">
+				Arriving				
+				<label class="toggle toggle-balanced">
+				<input type="checkbox">
+				<div class="track">
+					<div class="handle"></div>
+				</div>
+			</li>
+			<label class="item item-input">
+				<i class="icon ion-calendar placeholder-icon"></i>
+				<input type="datetime" placeholder="Arrival time" ng-model="arrivalTime">
+			</label>
+			<label class="item item-input item-select">
+				<i class="icon ion-location placeholder-icon"></i>
+				<div class="input-select">
+					Location
+				</div>
+				<select> 
+					<option selected>Home 1</option>
+					<option>Home 2</option>
+				</select>
+				</label>
+			</label>
+		</div>
+		<div class="list card">
+			<li class="item item-toggle">
+				Leaving				
+				<label class="toggle toggle-balanced">
+				<input type="checkbox">
+				<div class="track">
+					<div class="handle"></div>
+				</div>
+			</li>
+			<label class="item item-input">
+				<i class="icon ion-calendar placeholder-icon"></i>
+				<input type="datetime" placeholder="Leaving time" ng-model="leaveTime">
+			</label>
+			<label class="item item-input item-select">
+				<i class="icon ion-location placeholder-icon"></i>
+				<div class="input-select">
+					Location
+				</div>
+				<select> 
+					<option selected>Parking zone 1</option>
+					<option>Parking zone 2</option>
+					<option>Parking zone 3</option>
+				</select>
+				</label>
+			</label>
+		</div>
+	</ion-content>
+</ion-view>

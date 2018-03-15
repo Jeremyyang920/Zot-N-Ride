@@ -1,0 +1,63 @@
+<ion-view view-title="Registration">
+	<ion-content>
+		<form ng-submit="registerAccount()">
+			<div class="list">
+				<label class="item item-input">
+					<span class="input-label">First name</span>
+					<input type="text" ng-model="registrationData.firstName">
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Last name</span>
+					<input type="text" ng-model="registrationData.lastName">
+				</label>
+			</div>
+			<div class="list">
+				<label class="item item-input">
+					<span class="input-label">Email</span>
+					<input type="text" ng-model="registrationData.email">
+				</label>
+				<label class="item item-input">
+					<span class="input-label">Password</span>
+					<input type="password" ng-model="registrationData.password">
+				</label>
+			</div>
+			<div class="list">
+				<label class="item item-input">
+					<span class="input-label">Address</span>
+					<input type="text" ng-model="registrationData.address.street">
+				</label>
+				<label class="item item-input">
+					<span class="input-label">City</span>
+					<input type="text" ng-model="registrationData.address.city">
+				</label>
+				<label class="item item-input item-select">
+					<div class="input-label">
+						Housing Community
+					</div>
+					<select ng-model="registrationData.address.community">
+						<option selected>ACC</option> 
+						<option>UTC</option>
+						<option>Turtle Rock</option>
+						<option>Rancho San Joaquin</option>
+						<option>Park West</option>
+						<option>Park Place</option>
+						<option>Other</option>
+						<option>None</option>
+					</select>
+				</label>
+				<label class="item item-input item-select">
+					<div class="input-label">
+						User Type
+					</div>
+					<select ng-model="registrationData.userType"> 
+					<option selected>Driver</option>
+					<option>Rider</option>
+					</select>
+				</label>
+				<label class="item">
+					<button class="button button-block button-positive" ui-sref="app.upload" type="submit" ng-click="registerAccount()">Sign up</button>          
+				</label>
+			</div>
+		</form>
+	</ion-content>
+</ion-view>
