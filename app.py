@@ -64,7 +64,7 @@ def import_calendar_file():
     body = request.json
     arrivals = dict()
     departures = dict()
-    cal = Calendar(urllib.unquote(body['ics_plaintext']).decode('utf8'))
+    cal = Calendar(urllib.parse.unquote(body['ics_plaintext'])
     for event in cal.events:
         if 'Final Exam' not in event.name:
             course_name = ' '.join(event.name.split()[:2])
