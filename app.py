@@ -66,6 +66,7 @@ def import_calendar_file():
     departures = dict()
     cal = Calendar(urllib.parse.unquote(body['ics_plaintext']))
     for event in cal.events:
+        event.name = event.name.replace('+',' ')
         if 'Final Exam' not in event.name:
             course_name = ' '.join(event.name.split()[:2])
             days = calendar.day_name[event.begin.weekday()][:3]
