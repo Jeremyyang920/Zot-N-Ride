@@ -124,7 +124,7 @@ def update_user_times(netID:str,arrivals:dict,departures:dict):
 
 def update_classes(netID:str,classes:[str]):
     user = users.find_one({'netID':netID})
-    users.update_one({'_id':user['_id']}, {'$set': {'classes':courses}}, upsert=False)
+    users.update_one({'_id':user['_id']}, {'$set': {'classes':classes}}, upsert=False)
 
 if __name__ == '__main__':
     riders,drivers = load_all_users()
