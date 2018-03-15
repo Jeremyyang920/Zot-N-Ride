@@ -1,4 +1,5 @@
 from flask import Flask,abort,request,Response
+import urllib
 import json
 from flask import jsonify
 from flask import Flask
@@ -63,7 +64,7 @@ def import_calendar_file():
     body = request.json
     arrivals = dict()
     departures = dict()
-    cal = Calendar(body['ics_plaintext'])
+    cal = Calendar(urllib.unquote(body['ics_plaintext']).decode('utf8'))
     for event in cal.events:
         if 'Final Exam' not in event.name:
             course_name = ' '.join(event.name.split()[:2])
