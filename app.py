@@ -66,11 +66,13 @@ def import_calendar_file():
     body = request.json
     arrivals = dict()
     departures = dict()
+    classes = []
     cal = Calendar(urllib.parse.unquote(body['ics_plaintext']))
     for event in cal.events:
         event.name = event.name.replace('+',' ')
         if 'Final Exam' not in event.name:
             course_name = ' '.join(event.name.split()[:2])
+            classes.append(course_name)
             days = calendar.day_name[event.begin.weekday()][:3]
             begin_time, end_time = format_time(event.begin - datetime.timedelta(seconds=TEN_MINUTES)), format_time(event.end + datetime.timedelta(seconds=TEN_MINUTES))
             hours, minutes = str(event.duration).split(':')[:2]
@@ -84,6 +86,7 @@ def import_calendar_file():
                 if day not in departures or end_time_integer > departures[day]:
                     departures[day] = end_time_integer
     user_object = ZNR.update_user_times(body['netID'],arrivals,departures)
+    ZNR.update_classes(body['netID'],classes)
     return get_user_json(user_object)
 
 def format_time(date_object):

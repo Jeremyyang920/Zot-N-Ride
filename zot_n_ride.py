@@ -122,6 +122,10 @@ def update_user_times(netID:str,arrivals:dict,departures:dict):
         users.update_one({'_id':user['_id']}, {'$set': {'departures.'+k:v}}, upsert=False)
     return user
 
+def update_classes(netID:str,classes:[str]):
+    user = user.find_one({'netID':netID})
+    users.update_one({'_id':user['_id']}, {'$set': {'classes':courses}}, upsert=False)
+
 if __name__ == '__main__':
     riders,drivers = load_all_users()
     print(match_users_with_db(riders,drivers))
