@@ -123,7 +123,7 @@ def update_user_times(netID:str,arrivals:dict,departures:dict):
     return user
 
 def update_classes(netID:str,classes:[str]):
-    user = user.find_one({'netID':netID})
+    user = users.find_one({'netID':netID})
     users.update_one({'_id':user['_id']}, {'$set': {'classes':courses}}, upsert=False)
 
 if __name__ == '__main__':
