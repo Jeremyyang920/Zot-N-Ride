@@ -72,21 +72,17 @@ angular.module('zotnride.controllers', [])
       },
       headers: {'Content-Type': 'application/json'}
     }).then(function successCallback(response) {
-      if (response.status === 400) {
-        $scope.showLoginFailedAlert = function() {
-          var alertPopup = $ionicPopup.alert({
-            title: 'Login Failed',
-            template: 'Email/password is incorrect.'
-          });
-        };
-
-        $scope.showLoginFailedAlert();
-      } else {
-        window.localStorage.setItem('netID', response.data.netID);
-        $scope.loginModal.hide();
-      }
+      window.localStorage.setItem('netID', response.data.netID);
+      $scope.loginModal.hide();
     }, function errorCallback(response) {
-      console.log(JSON.stringify(response));
+      $scope.showLoginFailedAlert = function() {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Login Failed',
+          template: 'Email/password is incorrect.'
+        });
+      };
+
+      $scope.showLoginFailedAlert();
     });
   };
 
