@@ -53,7 +53,7 @@ def login_user():
     return get_user_json(query)
 
 # Endpoint for User Profile
-@app.route('/api/<netID>')
+@app.route('/api/user/<netID>')
 def display_user(netID):
     query = ZNR.get_user(netID)
     return get_user_json(query)
@@ -71,7 +71,7 @@ def import_calendar_file():
     for event in cal.events:
         event.name = event.name.replace('+',' ')
         if 'Final Exam' not in event.name:
-            course_name = ' '.join(event.name.split()[:2])
+            course_name = ' '.join(event.name.split())
             classes.append(course_name)
             days = calendar.day_name[event.begin.weekday()][:3]
             begin_time, end_time = format_time(event.begin - datetime.timedelta(seconds=TEN_MINUTES)), format_time(event.end + datetime.timedelta(seconds=TEN_MINUTES))
