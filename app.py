@@ -36,7 +36,7 @@ def register_user():
         abort(400)
     body = request.json
     hashedPW = bcrypt.hashpw(body['password'].encode('utf-8'),bcrypt.gensalt(12))
-    query = ZNR.create_user_into_db(body['netID'],hashedPW,body['firstname'],body['lastname'],body['major'],body['address'],body['isDriver'])
+    query = ZNR.create_user_into_db(body['netID'],hashedPW,body['firstname'],body['lastname'],body['major'],body['address'],body['isDriver'],body['arrivals'],body['departures'])
     if query == None:
         abort(400)
     return get_user_json(query)
@@ -116,19 +116,19 @@ def add_request():
     if not request.json:
         abort(400)
     body = request.json
-    query=ZNR.add_user_request(body['netID'],body['direction'],body['time'])
+    query = ZNR.add_user_request(body['netID'],body['direction'],body['time'])
     return get_user_json(query)
 
 @app.route('/api/removeRequest',methods=['POST'])
 def remove_request():
     if not request.json:
         abort(400)
-    body=request.json
-    query=ZNR.remove_user_request(body['netID'],body['direction'])
-    #Abort 400 if nothing was removed. Meaning the request never existed.
-    if(query) == 0:
+    body = request.json
+    query = ZNR.remove_user_request(body['netID'],body['direction'])
+    # abort 400 if nothing was removed, meaning the request never existed
+    if query == 0:
         abort(400)
-    #Need the call to ZNR.get_user b/c delete_one returns the count
-    #of items deleted instead of the json of object deleted.
+    # need the call to ZNR.get_user because delete_one returns the count
+    # of items deleted instead of the json of object deleted
     return get_user_json(ZNR.get_user(body['netID']))
     

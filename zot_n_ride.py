@@ -93,11 +93,11 @@ def create_user_from_json(first_name: str, last_name: str):
     else:
         return rider.Rider(first=user['name']['first'],last=user['name']['last'],age=int(user['age']),year=int(user['year']),netID=user['netID'],major=user['major'],phone=user['phone'],address=user['address'])
 
-def create_user_into_db(netID:str,password:str,first_name:str,last_name:str,major:str,address:str,isDriver:bool):
+def create_user_into_db(netID:str,password:str,first_name:str,last_name:str,major:str,address:str,isDriver:bool,arrivals:dict,departures:dict):
     if users.find_one({'netID':netID}) != None:
         log.error('User already exists.')
         return None
-    user = users.insert_one({'netID':netID,'password':password,'name':{'first':first_name,'last':last_name},'major':major,'address':address,'isDriver':isDriver})
+    user = users.insert_one({'netID':netID,'password':password,'name':{'first':first_name,'last':last_name},'major':major,'address':address,'isDriver':isDriver,'arrivals':arrivals,'departures':departures})
     log.info('User successfully created.')
     return get_user(netID)
 
@@ -132,10 +132,10 @@ def add_user_request(netID:str,direction:int,time:int):
     return get_user(netID)
 
 def remove_user_request(netID:str,direction:int):
-    #This assumes that a user will only have 1 to and from request
-    #No Duplicates
-    result=requests.delete_one({'netID':netID,'direction':direction})
+    # this function assumes that a user will only have one "to" and one "from" request (no duplicates)
+    result = requests.delete_one({'netID':netID,'direction':direction})
     return result
+
 if __name__ == '__main__':
     riders,drivers = load_all_users()
     print(match_users_with_db(riders,drivers))
