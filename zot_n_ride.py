@@ -23,7 +23,8 @@ log = logger.configure_logger()
 client = MongoClient(environ.get('MONGO_CLIENT_URI'))
 db = client['test']
 users = db.users
-requests=db.requests
+requests = db.requests
+matches = db.matches
 
 def match_users_with_db(riders, drivers) -> dict:
     tomorrow = DAYS_OF_WEEK[(datetime.datetime.today().weekday()+1)%len(DAYS_OF_WEEK)]
