@@ -110,3 +110,12 @@ def get_user_json(query):
     del return_value['_id']
     del return_value['password']
     return json.dumps(return_value)
+
+@app.route('/api/addRequest',methods=['POST'])
+def add_request():
+    if not request.json:
+        abort(400)
+    body = request.json
+    x=ZNR.add_user_request(body['netID'],body['direction'],body['time'])
+    return get_user_json(x)
+    
