@@ -119,7 +119,7 @@ def add_request():
     query=ZNR.add_user_request(body['netID'],body['direction'],body['time'])
     return get_user_json(query)
 
-@app.route('/api/removeRequest',methods=['POST']):
+@app.route('/api/removeRequest',methods=['POST'])
 def remove_request():
     if not request.json:
         abort(400)
