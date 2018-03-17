@@ -32,8 +32,14 @@ def match_users_with_db(riders, drivers) -> dict:
     for rider in riders:
         for driver in drivers:
             delta_distance = abs((maps.calc_driving_time(driver['address'],rider['address']) + rider['time_to_uci'] + BUFFER_PICKUP_TIME) - driver['time_to_uci'])
-            delta_arrival = abs(rider['arrivals'][tomorrow] - driver['arrivals'][tomorrow])
-            delta_departure = abs(rider['departures'][tomorrow] - driver['departures'][tomorrow])
+            if tomorrow in rider['arrivals'] and tomorrow in driver['arrivals']:
+                delta_arrival = abs(rider['arrivals'][tomorrow] - driver['arrivals'][tomorrow])
+            else:
+                delta_arrival = 0
+            if tomorrow in rider['departures'] and tomorrow in driver['departures']:
+                delta_departure = abs(rider['departures'][tomorrow] - driver['departures'][tomorrow])
+            else:
+                delta_departure = 0
             rider_name = rider['name']['first'] + ' ' + rider['name']['last']
             driver_name = driver['name']['first'] + ' ' + driver['name']['last']
             result[rider_name][driver_name] = delta_distance + delta_arrival + delta_departure
@@ -50,7 +56,7 @@ def match_users_with_classes(riders: [rider.Rider], drivers: [driver.Driver]) ->
 def extract_matches(input_dict: dict) -> dict:
     result = dict()
     for k in input_dict:
-        result[k] = min(input_dict[k].items(),key = lambda x: x[1])[0]
+        result[k] = sorted(input_dict[k].items(),key = lambda x: x[1])[:3]
     return result
 
 def confirm_email(u: user.User):
