@@ -83,9 +83,9 @@ def confirm_phone(u: user.User):
 
 def load_all_users():
     riders,drivers = [],[]
-    for user in users.find({}):
+    for user in requests.find({}):
         users.update_one({'_id':user['_id']}, {'$set': {'time_to_uci':maps.calc_driving_time(user['address'],'place_id:{}'.format(maps.UCI_PLACE_ID))}}, upsert=False)
-    for user in users.find({}):
+    for user in requests.find({}):
         if 'arrivals' in user and 'departures' in user:
             if user['isDriver']:
                 drivers.append(user)
