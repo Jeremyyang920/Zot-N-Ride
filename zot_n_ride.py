@@ -23,6 +23,7 @@ log = logger.configure_logger()
 client = MongoClient(environ.get('MONGO_CLIENT_URI'))
 db = client['test']
 users = db.users
+requests=db.requests
 
 def match_users_with_db(riders, drivers) -> dict:
     tomorrow = DAYS_OF_WEEK[(datetime.datetime.today().weekday()+1)%len(DAYS_OF_WEEK)]
@@ -126,6 +127,9 @@ def update_classes(netID:str,classes:[str]):
     user = users.find_one({'netID':netID})
     users.update_one({'_id':user['_id']}, {'$set': {'classes':classes}}, upsert=False)
 
+def add_user_request(netID:str,direction:int,time:int):
+    requests.insert_one({'netID':netID,'direction':direction,'time':time})
+    return get_user(netID)
 if __name__ == '__main__':
     riders,drivers = load_all_users()
     print(match_users_with_db(riders,drivers))
