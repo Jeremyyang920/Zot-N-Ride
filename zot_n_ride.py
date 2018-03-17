@@ -130,6 +130,12 @@ def update_classes(netID:str,classes:[str]):
 def add_user_request(netID:str,direction:int,time:int):
     requests.insert_one({'netID':netID,'direction':direction,'time':time})
     return get_user(netID)
+
+def remove_user_request(netID:str,direction:int):
+    #This assumes that a user will only have 1 to and from request
+    #No Duplicates
+    result=requests.delete_one({'netID':netID,'direction':direction})
+    return result
 if __name__ == '__main__':
     riders,drivers = load_all_users()
     print(match_users_with_db(riders,drivers))

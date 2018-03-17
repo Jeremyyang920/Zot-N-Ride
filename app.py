@@ -116,6 +116,19 @@ def add_request():
     if not request.json:
         abort(400)
     body = request.json
-    x=ZNR.add_user_request(body['netID'],body['direction'],body['time'])
-    return get_user_json(x)
+    query=ZNR.add_user_request(body['netID'],body['direction'],body['time'])
+    return get_user_json(query)
+
+@app.route('/api/removeRequest',methods=['POST'])
+def remove_request():
+    if not request.json:
+        abort(400)
+    body=request.json
+    query=ZNR.remove_user_request(body['netID'],body['direction'])
+    #Abort 400 if nothing was removed. Meaning the request never existed.
+    if(query) == 0:
+        abort(400)
+    #Need the call to ZNR.get_user b/c delete_one returns the count
+    #of items deleted instead of the json of object deleted.
+    return get_user_json(ZNR.get_user(body['netID']))
     
