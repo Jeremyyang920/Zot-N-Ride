@@ -171,7 +171,7 @@ def add_user_request(netID:str, direction:int, time:int) -> dict:
 def find_previous_search(netID:str, direction:int) -> dict:
     return searches.find_one({'netID':netID,'direction':direction})
 
-def is_driver(netID:str):
+def is_driver(netID:str) -> bool:
     user = users.find_one({'netID':netID})
     return user['isDriver']
     
