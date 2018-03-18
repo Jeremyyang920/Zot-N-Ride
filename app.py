@@ -138,13 +138,15 @@ def get_requests(netID,direction):
     if not ZNR.is_driver(netID):
         abort(400)
     direction_number = int(direction)
+    if direction_number >= 2:
+        abort(400)
     fetch_search = ZNR.find_previous_search(netID,direction_number)
     if fetch_search != None:
         return json.dumps(fetch_search[netID])
     lists = ZNR.load_all_requests()
     if direction_number == 0:
         return json.dumps(ZNR.match_users_to_uci(lists[0],lists[1])[netID])
-    else:
+    elif direction_number == 1:
         return json.dumps(ZNR.match_users_to_home(lists[2],lists[3])[netID])
 
 @app.route('/api/confirmRequest',methods=['POST'])
@@ -158,7 +160,7 @@ def confirm_request():
     ZNR.remove_users_from_request_pool(body['driverID'],body['riderID'],body['direction'])
     if body['direction'] == 0:
         return 'Successfully matched {} with {} when going to UCI.'.format(body['driverID'],body['riderID'])
-    else:
+    elif body['direction'] == 1:
         return 'Successfully matched {} with {} when going home.'.format(body['driverID'],body['riderID'])
 
 @app.route('/api/getRideStatus')
@@ -167,9 +169,13 @@ def get_ride_status(netID):
     
 @app.route('/api/endRide',methods=['POST'])
 def end_ride():
-    if not requst.json:
+    if not request.json:
         abort(400)
-    
+    body = request.json
+    query = ZNR.remove_match(body['driverID'],body['riderID'],body['direction'])
+    if query == 0:
+        abort(400)
+    return 'Ride has ended between {} and {}.'.format(body['driverID'],body['riderID'])
     
 if __name__ == '__main__':
     if DEBUG_FLAG == 'true':
