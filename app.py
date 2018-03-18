@@ -152,10 +152,10 @@ def confirm_request():
     if not request.json:
         abort(400)
     body = request.json
-    ZNR.remove_users_from_request_pool(body['driverID'],body['riderID'],body['direction'])
     query = ZNR.add_match(body['driverID'],body['riderID'],body['direction'])
     if not query:
         abort(400)
+    ZNR.remove_users_from_request_pool(body['driverID'],body['riderID'],body['direction'])
     if body['direction'] == 0:
         return 'Successfully matched {} with {} when going to UCI.'.format(body['driverID'],body['riderID'])
     else:
