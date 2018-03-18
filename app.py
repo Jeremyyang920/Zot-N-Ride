@@ -165,9 +165,9 @@ def confirm_request():
         abort(400)
     ZNR.remove_users_from_request_pool(body['driverID'],body['riderID'],body['direction'])
     if body['direction'] == 0:
-        return 'Successfully matched {} with {} when going to UCI.'.format(body['driverID'],body['riderID'])
+        return {'message':'Successfully matched {} with {} when going to UCI.'.format(body['driverID'],body['riderID'])}
     elif body['direction'] == 1:
-        return 'Successfully matched {} with {} when going home.'.format(body['driverID'],body['riderID'])
+        return {'message':'Successfully matched {} with {} when going home.'.format(body['driverID'],body['riderID'])}
 
 # Endpoint to Display User's Ride Status
 @app.route('/api/getRideStatus')
@@ -183,7 +183,7 @@ def end_ride():
     query = ZNR.remove_match(body['driverID'],body['riderID'],body['direction'])
     if not query:
         abort(400)
-    return 'Ride has ended between {} and {}.'.format(body['driverID'],body['riderID'])
+    return {'message':'Ride has ended between {} and {}.'.format(body['driverID'],body['riderID'])}
     
 if __name__ == '__main__':
     if DEBUG_FLAG == 'true':
