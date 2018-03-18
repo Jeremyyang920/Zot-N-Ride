@@ -168,17 +168,23 @@ def add_user_request(netID:str, direction:int, time:int) -> dict:
     requests.insert_one({'netID':netID,'direction':direction,'time':time})
     return get_user(netID)
 
+def remove_user_request(netID:str, direction:int) -> int:
+    # this function assumes that a user will only have one "to" and one "from" request (no duplicates)
+    result = requests.delete_one({'netID':netID,'direction':direction})
+    return result
+
 def find_previous_search(netID:str, direction:int) -> dict:
     return searches.find_one({'netID':netID,'direction':direction})
 
 def is_driver(netID:str) -> bool:
     user = users.find_one({'netID':netID})
     return user['isDriver']
-    
-def remove_user_request(netID:str, direction:int) -> int:
-    # this function assumes that a user will only have one "to" and one "from" request (no duplicates)
-    result = requests.delete_one({'netID':netID,'direction':direction})
-    return result
+
+def add_match(driverID:str,riderID:str,direction:int) -> dict:
+    new_match = dict()
+    if matches.find_one({'driverID':driverID,'riderID':riderID,'direction':direction}) == None:
+        new_match = matches.insert_one({'driverID':driverID,'riderID':riderID,'direction':direction})
+    return new_match
 
 def confirm_email(u:user.User) -> None:
     sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
