@@ -138,4 +138,5 @@ def remove_request():
     return get_user_json(ZNR.get_user(body['netID']))
     
 if __name__ == '__main__':
-    app.debug = DEBUG_FLAG
+    if DEBUG_FLAG == 'true':
+        app.debug = True
