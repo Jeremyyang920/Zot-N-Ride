@@ -8,6 +8,10 @@
 				<i class="icon ion-calendar placeholder-icon"></i>
 				<input type="text" ng-click="setArrivalTime()" readonly placeholder="Class Time" ng-model="getArrivalTime">
 			</label>
+			<button ng-if="requests.length > 0" ng-click='showRequests()' class="item item-icon-left assertive">
+					<i class="icon ion-android-car"></i>
+					View {{requests.length}} Requests
+			</button>
 		</div>
 		<div class="list card">
 			<ion-toggle ng-model="activatedDeparture" ng-change="toggleRequest(1)">
@@ -17,6 +21,10 @@
 				<i class="icon ion-calendar placeholder-icon"></i>
 				<input type="text" ng-click="setDepartureTime()" readonly placeholder="Departure time" ng-model="getDepartureTime">
 			</label>
+			<button ng-if="requests.length > 0" ng-click='showRequests()' class="item item-icon-left assertive">
+					<i class="icon ion-android-car"></i>
+					View {{requests.length}} Requests
+			</button>	
 		</div>
 	</ion-content>
 </ion-view>

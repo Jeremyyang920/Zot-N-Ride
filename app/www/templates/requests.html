@@ -1,0 +1,26 @@
+<ion-modal-view>
+    <ion-header-bar>
+        <h1 class="title">Requests</h1>
+        <button class="button button-clear button-stable" ng-click="closeRequests()">
+            <i class="icon ion-close-round"></i>
+        </button>
+        </div>
+    </ion-header-bar>
+    <ion-content>
+        <div class="card" ng-repeat="request in requests">
+            <div class="item item-text-wrap">
+                {{request.toSchool.riderInfo}} has requested a ride. You need to leave {{request.toSchool.leaveAt}} minutes early
+            </div>
+            <div class="item item-divider button-bar">
+                <button ng-click='declineRequest(requests.indexOf(request))' class="button assertive">
+                        <i class="icon ion-close-round"></i>
+                        Decline
+                </a>
+                <button ng-click='acceptRequest(requests.indexOf(request))' class="button balanced">
+                        <i class="icon ion-checkmark-round"></i>
+                        Accept
+                </a>
+            </div>
+        </div>
+    </ion-content>
+</ion-modal-view>

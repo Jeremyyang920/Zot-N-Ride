@@ -14,6 +14,20 @@ angular.module('zotnride.controllers', [])
   // Form data for the login modal
   $scope.loginData = {};
   $scope.user = JSON.parse($window.localStorage.getItem('user'));
+  $scope.requests = [
+    {
+      "toSchool": { "time": "123", "riderInfo": "tvwong", leaveAt: "120" }, 
+      "fromSchool": { "time": "234", "riderInfo": "jeremy" } 
+    },
+    {
+      "toSchool": { "time": "123", "riderInfo": "anuj", leaveAt: "120" }, 
+      "fromSchool": { "time": "234", "riderInfo": "meetp" } 
+    },
+    {
+      "toSchool": { "time": "123", "riderInfo": "anuj", leaveAt: "120" }, 
+      "fromSchool": { "time": "234", "riderInfo": "meetp" } 
+    }
+  ];
 
   $ionicModal.fromTemplateUrl('templates/login.html', {
     scope: $scope,
@@ -35,6 +49,20 @@ angular.module('zotnride.controllers', [])
   $scope.showLogin = function() {
     $scope.loginModal.show();
   };
+
+  $scope.showRequests = function() {
+    $ionicModal.fromTemplateUrl('templates/requests.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      $scope.requestModal = modal;
+      $scope.requestModal.show();
+    })
+  };
+  
+  $scope.closeRequests = function() {
+    $scope.requestModal.hide();
+  }
 
   // Reserve Modal
   $ionicModal.fromTemplateUrl('templates/reserve.html', {
@@ -184,6 +212,13 @@ angular.module('zotnride.controllers', [])
   $scope.activatedArrival = false;
   $scope.activatedDeparture = false;
 
+  $scope.acceptRequest = function(index) {
+  }
+  
+  $scope.declineRequest = function(index) {
+    $scope.requests.splice(index, 1);
+  }
+
   $scope.toggleRequest = function(direction) {
     var endpoint, data = {};
     data.netID = $scope.user.netID;
@@ -236,6 +271,8 @@ angular.module('zotnride.controllers', [])
     });
   }
 })
+
+
 
 .controller('RegistrationCtrl', function($scope, $stateParams, $http) {
   $scope.registrationData = {};
