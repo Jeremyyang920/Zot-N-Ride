@@ -110,6 +110,7 @@ def get_user_json(query):
     del return_value['password']
     return json.dumps(return_value)
 
+# Endpoint to Add User to Request Pool
 @app.route('/api/addRequest',methods=['POST'])
 def add_request():
     if not request.json:
@@ -120,6 +121,7 @@ def add_request():
         abort(400)
     return get_user_json(query)
 
+# Endpoint to Remove User from Request Pool
 @app.route('/api/removeRequest',methods=['POST'])
 def remove_request():
     if not request.json:
@@ -133,6 +135,7 @@ def remove_request():
     # of items deleted instead of the json of object deleted
     return get_user_json(ZNR.get_user(body['netID']))
 
+# Endpoint to Display Rider Requests to Driver
 @app.route('/api/getRequests/<netID>/<direction>')
 def get_requests(netID,direction):
     if not ZNR.is_driver(netID):
@@ -149,6 +152,7 @@ def get_requests(netID,direction):
     elif direction_number == 1:
         return json.dumps(ZNR.match_users_to_home(lists[2],lists[3])[netID])
 
+# Endpoint to Confirm Match
 @app.route('/api/confirmRequest',methods=['POST'])
 def confirm_request():
     if not request.json:
@@ -163,10 +167,12 @@ def confirm_request():
     elif body['direction'] == 1:
         return 'Successfully matched {} with {} when going home.'.format(body['driverID'],body['riderID'])
 
+# Endpoint to Display User's Ride Status
 @app.route('/api/getRideStatus')
 def get_ride_status(netID):
     pass
-    
+
+# Endpoint to Remove Match
 @app.route('/api/endRide',methods=['POST'])
 def end_ride():
     if not request.json:
