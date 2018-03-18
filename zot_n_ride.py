@@ -184,6 +184,10 @@ def is_driver(netID:str) -> bool:
     user = users.find_one({'netID':netID})
     return user['isDriver']
 
+def remove_users_from_request_pool(driverID:str,riderID:str,direction:int):
+    remove_user_request(driverID,direction)
+    remove_user_request(riderID,direction)
+
 def add_match(driverID:str,riderID:str,direction:int) -> dict:
     new_match = dict()
     if matches.find_one({'driverID':driverID,'riderID':riderID,'direction':direction}) == None:
