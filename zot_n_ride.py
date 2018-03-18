@@ -200,6 +200,21 @@ def remove_match(driverID:str,riderID:str,direction:int) -> bool:
     result = matches.delete_one({'driverID':driverID,'riderID':riderID,'direction':direction})
     return True
 
+def get_rides(netID:str) -> dict:
+    result = {}
+    for match in matches.find({}):
+        if match['riderID'] == netID:
+            if match['direction'] == 0:
+                result['toSchool'] = {'driverID':match['driverID']}
+            elif match['direction'] == 1:
+                result['fromSchool'] = {'driverID':match['driverID']}
+        elif match['driverID'] == netID:
+            if match['direction'] == 0:
+                result['toSchool'] = {'riderID':match['riderID']}
+            elif match['direction'] == 1:
+                result['fromSchool'] = {'riderID':match['riderID']}
+    return result
+
 def confirm_email(u:user.User) -> None:
     sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
     from_email = Email('confirm_email@zotnride.stream')

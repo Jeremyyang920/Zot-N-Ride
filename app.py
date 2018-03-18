@@ -178,7 +178,7 @@ def confirm_request():
 # Endpoint to Display User's Ride Status
 @app.route('/api/getRideStatus/<netID>')
 def get_ride_status(netID):
-    result = dict()
+    result = ZNR.get_rides(netID)
     return json.dumps(result)
 
 # Endpoint to Remove Match
