@@ -179,7 +179,7 @@ def end_ride():
         abort(400)
     body = request.json
     query = ZNR.remove_match(body['driverID'],body['riderID'],body['direction'])
-    if query == 0:
+    if not query:
         abort(400)
     return 'Ride has ended between {} and {}.'.format(body['driverID'],body['riderID'])
     
