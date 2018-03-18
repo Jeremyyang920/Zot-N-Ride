@@ -194,9 +194,11 @@ def add_match(driverID:str,riderID:str,direction:int) -> dict:
         new_match = matches.insert_one({'driverID':driverID,'riderID':riderID,'direction':direction})
     return new_match
 
-def remove_match(driverID:str,riderID:str,direction:int) -> None:
+def remove_match(driverID:str,riderID:str,direction:int) -> bool:
+    if matches.find_one({'driverID':driverID,'riderID':riderID,'direction':direction}) == None:
+        return False
     result = matches.delete_one({'driverID':driverID,'riderID':riderID,'direction':direction})
-    return result
+    return True
 
 def confirm_email(u:user.User) -> None:
     sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
