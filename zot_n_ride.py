@@ -35,7 +35,7 @@ def match_users_to_uci(riders:list, drivers:list) -> dict:
             delta_route = abs(calc_detour_time_to_uci(driver['address'],rider['address'],rider['time_to_uci']) - driver['time_to_uci'])
             delta_arrival = abs(rider_time - driver_time)
             result[rider['netID']][driver['netID']] = delta_route + delta_arrival
-    return extract_matches(result)
+    return rank_matches(result)
 
 def match_users_to_home(riders:list, drivers:list) -> dict:
     result = defaultdict(dict)
@@ -46,9 +46,9 @@ def match_users_to_home(riders:list, drivers:list) -> dict:
             delta_route = abs(calc_detour_time_to_home(driver['address'],rider['address'],rider['time_to_home']) - driver['time_to_home'])
             delta_departure = abs(rider_time - driver_time)
             result[rider['netID']][driver['netID']] = delta_route + delta_departure
-    return extract_matches(result)
+    return rank_matches(result)
 
-def extract_matches(input_dict:dict) -> dict:
+def rank_matches(input_dict:dict) -> dict:
     result = dict()
     for k in input_dict:
         result[k] = sorted(input_dict[k].items(),key = lambda x: x[1])
@@ -78,7 +78,7 @@ def match_users_with_classes(riders:[rider.Rider], drivers:[driver.Driver]) -> d
         for driver in drivers:
             delta_time = (maps.calc_driving_time(driver.address,rider.address) + rider.time_to_uci + BUFFER_PICKUP_TIME) - driver.time_to_uci
             result[rider][driver] = delta_time
-    return extract_matches(result)
+    return rank_matches(result)
 
 def load_all_requests() -> (list,list,list,list):
     uci_riders,uci_drivers = [],[]
@@ -154,7 +154,7 @@ def update_classes(netID:str, classes:[str]) -> dict:
     return user
 
 def add_user_request(netID:str, direction:int, time:int) -> dict:
-    if users.find_one({'netID':netID}) == None or requests.find_one({'netID':netID,'direction',direction,'time':time}) not None:
+    if users.find_one({'netID':netID}) == None or requests.find_one({'netID':netID,'direction':direction}) != None:
         return False
     requests.insert_one({'netID':netID,'direction':direction,'time':time})
     return get_user(netID)
@@ -190,5 +190,5 @@ if __name__ == '__main__':
     uci_riders,uci_drivers,home_riders,home_drivers = load_all_requests()
     uci_matches = match_users_to_uci(uci_riders,uci_drivers)
     home_matches = match_users_to_home(home_riders,home_drivers)
-    print(uci_matches)
-    print(home_matches)
+    print('To UCI: {}'.format(uci_matches))
+    print('From UCI: {}'.format(home_matches))
