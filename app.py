@@ -8,12 +8,15 @@ from flask_pymongo import PyMongo
 from ics import Calendar
 import calendar
 import datetime
+from os import environ
 
 app = Flask(__name__)
 
 import sys
 import zot_n_ride as ZNR
 import bcrypt
+
+DEBUG_FLAG = environ.get('DEBUG_FLAG')
 
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
@@ -134,3 +137,5 @@ def remove_request():
     # of items deleted instead of the json of object deleted
     return get_user_json(ZNR.get_user(body['netID']))
     
+if __name__ == '__main__':
+    app.debug = DEBUG_FLAG
