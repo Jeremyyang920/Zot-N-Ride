@@ -155,7 +155,10 @@ def confirm_request():
     query = ZNR.add_match(body['driverID'],body['riderID'],body['direction'])
     if not query:
         abort(400)
-    return query
+    if body['direction'] == 0:
+        return 'Successfully matched {} with {} when going to UCI.'.format(body['driverID'],body['riderID'])
+    else:
+        return 'Successfully matched {} with {} when going home.'.format(body['driverID'],body['riderID'])
 
 @app.route('/api/getRideStatus')
 def get_ride_status(netID):
