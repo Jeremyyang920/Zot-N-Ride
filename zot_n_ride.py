@@ -154,6 +154,8 @@ def update_classes(netID:str, classes:[str]) -> dict:
     return user
 
 def add_user_request(netID:str, direction:int, time:int) -> dict:
+    if users.find_one({'netID':netID}) == None:
+        return False
     requests.insert_one({'netID':netID,'direction':direction,'time':time})
     return get_user(netID)
 
