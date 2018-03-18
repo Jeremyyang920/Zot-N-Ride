@@ -38,7 +38,8 @@ def match_users_to_uci(riders:list, drivers:list) -> dict:
             result[rider['netID']][driver['netID']] = delta_route + delta_arrival
     ranked_results = rank_matches(result)
     for k,v in ranked_results.items():
-        rider_searches.insert_one({'riderID':k,'direction':0,'rankedMatches':v})
+        if rider_searches.find_one({'riderID':k,'direction':0}) == None:
+            rider_searches.insert_one({'riderID':k,'direction':0,'rankedMatches':v})
     return ranked_results
 
 def match_users_to_home(riders:list, drivers:list) -> dict:
@@ -52,7 +53,8 @@ def match_users_to_home(riders:list, drivers:list) -> dict:
             result[rider['netID']][driver['netID']] = delta_route + delta_departure
     ranked_results = rank_matches(result)
     for k,v in ranked_results.items():
-        rider_searches.insert_one({'riderID':k,'direction':0,'rankedMatches':v})
+        if rider_searches.find_one({'riderID':k,'direction':1}) == None:
+            rider_searches.insert_one({'riderID':k,'direction':1,'rankedMatches':v})
     return ranked_results
 
 def rank_matches(input_dict:dict) -> dict:
