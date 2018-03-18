@@ -33,9 +33,11 @@ def match_users_to_uci(riders:list, drivers:list) -> dict:
         rider,rider_time = rider_tuple
         for driver_tuple in drivers:
             driver,driver_time = driver_tuple
-            delta_route = abs(calc_detour_time_to_uci(driver['address'],rider['address'],rider['time_to_uci']) - driver['time_to_uci'])
+            detour_time = calc_detour_time_to_uci(driver['address'],rider['address'],rider['time_to_uci'])
+            delta_route = abs(detour_time - driver['time_to_uci'])
             delta_arrival = abs(rider_time - driver_time)
-            result[driver['netID']][rider['netID']] = delta_route + delta_arrival
+            result[driver['netID']][rider['netID']] = {'solo_time':driver['time_to_uci'],'carpool_time':detour_time,'delta_route':delta_route,'delta_time':delta_arrival,
+                                                       'score':delta_route+delta_arrival}
     ranked_results = rank_matches(result)
     for k,v in ranked_results.items():
         if searches.find_one({'driverID':k,'direction':0}) == None:
@@ -48,9 +50,11 @@ def match_users_to_home(riders:list, drivers:list) -> dict:
         rider,rider_time = rider_tuple
         for driver_tuple in drivers:
             driver,driver_time = driver_tuple
-            delta_route = abs(calc_detour_time_to_home(driver['address'],rider['address'],rider['time_to_home']) - driver['time_to_home'])
+            detour_time = calc_detour_time_to_home(driver['address'],rider['address'],rider['time_to_home'])
+            delta_route = abs(detour_time - driver['time_to_home'])
             delta_departure = abs(rider_time - driver_time)
-            result[driver['netID']][rider['netID']] = delta_route + delta_departure
+            result[driver['netID']][rider['netID']] = {'solo_time':driver['time_to_home'],'carpool_time':detour_time,'delta_route':delta_route,'delta_time':delta_departure,
+                                                       'score':delta_route+delta_departure}
     ranked_results = rank_matches(result)
     for k,v in ranked_results.items():
         if searches.find_one({'driverID':k,'direction':1}) == None:
@@ -60,7 +64,7 @@ def match_users_to_home(riders:list, drivers:list) -> dict:
 def rank_matches(input_dict:dict) -> dict:
     result = dict()
     for k in input_dict:
-        result[k] = [tup[0] for tup in sorted(input_dict[k].items(),key = lambda x: x[1])]
+        result[k] = sorted(input_dict[k].items(),key = lambda x: x[1]['score'])
     return result
 
 def calc_detour_time_to_uci(driver_address:str, rider_address:str, rider_to_uci:int) -> int:
