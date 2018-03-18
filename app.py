@@ -116,6 +116,8 @@ def add_request():
     if not request.json:
         abort(400)
     body = request.json
+    if body['direction'] >= 2:
+        abort(400)
     query = ZNR.add_user_request(body['netID'],body['direction'],body['time'])
     if not query:
         abort(400)
@@ -127,6 +129,8 @@ def remove_request():
     if not request.json:
         abort(400)
     body = request.json
+    if body['direction'] >= 2:
+        abort(400)
     query = ZNR.remove_user_request(body['netID'],body['direction'])
     # abort 400 if nothing was removed, meaning the request never existed
     if query == 0:
@@ -160,6 +164,8 @@ def confirm_request():
     if not request.json:
         abort(400)
     body = request.json
+    if body['direction'] >= 2:
+        abort(400)
     query = ZNR.add_match(body['driverID'],body['riderID'],body['direction'])
     if not query:
         abort(400)
