@@ -193,7 +193,7 @@ def remove_users_from_request_pool(driverID:str,riderID:str,direction:int) -> No
 def add_match(driverID:str,riderID:str,direction:int) -> dict:
     new_match = dict()
     if matches.find_one({'driverID':driverID,'riderID':riderID,'direction':direction}) == None:
-        driver_request = requests.find_one({'driverID':driverID,'direction':direction}):
+        driver_request = requests.find_one({'netID':driverID,'direction':direction}):
         if driver_request != None:
             new_match = matches.insert_one({'driverID':driverID,'riderID':riderID,'direction':direction,'time':driver_request['time']})
     return new_match
