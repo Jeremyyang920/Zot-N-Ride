@@ -64,7 +64,7 @@ def match_users_to_home(riders:list, drivers:list) -> dict:
 def rank_matches(input_dict:dict) -> dict:
     result = dict()
     for k in input_dict:
-        result[k] = sorted(input_dict[k].items(),key = lambda x: x[1]['score'])
+        result[k] = [{'riderID':tup[0],'results':tup[1]} for tup in sorted(input_dict[k].items(),key = lambda x: x[1]['score'])]
     return result
 
 def calc_detour_time_to_uci(driver_address:str, rider_address:str, rider_to_uci:int) -> int:
