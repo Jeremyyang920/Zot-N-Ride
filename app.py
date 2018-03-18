@@ -133,7 +133,7 @@ def remove_request():
     # of items deleted instead of the json of object deleted
     return get_user_json(ZNR.get_user(body['netID']))
 
-@app.route('/api/getDriverResults')
+@app.route('/api/getDriverResults/<netID>/<direction>')
 def get_ranked_drivers(netID,direction):
     fetch_search = ZNR.find_previous_search(netID,direction)
     if fetch_search != None:
