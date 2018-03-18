@@ -157,8 +157,9 @@ angular.module('zotnride.controllers', [])
     $scope.setArrivalTime = function() {
       $cordovaDatePicker.show({
         date: $scope.arrivalTime,
-        mode: 'time',
+        mode: 'datetime',
         minDate: Date,
+        maxDate: moment().add(1, 'day').endOf('day'),
         allowOldDates: false,
         minuteInterval: 30
       }).then(function(datetime) {
@@ -169,8 +170,9 @@ angular.module('zotnride.controllers', [])
     $scope.setDepartureTime = function() {
       $cordovaDatePicker.show({
         date: $scope.departureTime,
-        mode: 'time',
+        mode: 'datetime',
         minDate: Date,
+        maxDate: moment().add(1, 'day').endOf('day'),
         allowOldDates: false,
         minuteInterval: 30
       }).then(function(datetime) {
