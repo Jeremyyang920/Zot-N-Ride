@@ -25,6 +25,7 @@ db = client['test']
 users = db.users
 requests = db.requests
 matches = db.matches
+rider_searches = db.rider_searches
 
 def match_users_to_uci(riders:list, drivers:list) -> dict:
     result = defaultdict(dict)
@@ -35,7 +36,10 @@ def match_users_to_uci(riders:list, drivers:list) -> dict:
             delta_route = abs(calc_detour_time_to_uci(driver['address'],rider['address'],rider['time_to_uci']) - driver['time_to_uci'])
             delta_arrival = abs(rider_time - driver_time)
             result[rider['netID']][driver['netID']] = delta_route + delta_arrival
-    return rank_matches(result)
+    ranked_results = rank_matches(result)
+    for k,v in ranked_results.items():
+        rider_searches.insert_one({'riderID':k,'direction':0,'rankedMatches':v})
+    return ranked_results
 
 def match_users_to_home(riders:list, drivers:list) -> dict:
     result = defaultdict(dict)
@@ -46,12 +50,15 @@ def match_users_to_home(riders:list, drivers:list) -> dict:
             delta_route = abs(calc_detour_time_to_home(driver['address'],rider['address'],rider['time_to_home']) - driver['time_to_home'])
             delta_departure = abs(rider_time - driver_time)
             result[rider['netID']][driver['netID']] = delta_route + delta_departure
-    return rank_matches(result)
+    ranked_results = rank_matches(result)
+    for k,v in ranked_results.items():
+        rider_searches.insert_one({'riderID':k,'direction':0,'rankedMatches':v})
+    return ranked_results
 
 def rank_matches(input_dict:dict) -> dict:
     result = dict()
     for k in input_dict:
-        result[k] = sorted(input_dict[k].items(),key = lambda x: x[1])
+        result[k] = [tup[0] for tup in sorted(input_dict[k].items(),key = lambda x: x[1])]
     return result
 
 def calc_detour_time_to_uci(driver_address:str, rider_address:str, rider_to_uci:int) -> int:
@@ -159,6 +166,9 @@ def add_user_request(netID:str, direction:int, time:int) -> dict:
     requests.insert_one({'netID':netID,'direction':direction,'time':time})
     return get_user(netID)
 
+def find_previous_search(netID:str, direction:int):
+    return rider_searches.find_one({'netID':netID,'direction':direction})
+    
 def remove_user_request(netID:str, direction:int) -> int:
     # this function assumes that a user will only have one "to" and one "from" request (no duplicates)
     result = requests.delete_one({'netID':netID,'direction':direction})

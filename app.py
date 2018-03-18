@@ -28,10 +28,6 @@ TEN_MINUTES = 10*60 # used to create a ten minute buffer before and after a clas
 def welcome():
     return 'Welcome to Zot n\' Ride!'
 
-@app.route('/user/<username>')
-def display_profile(username):
-    return 'User {}'.format(username)
-
 # Endpoint for Creating a User
 @app.route('/api/register',methods=['POST'])
 def register_user():
@@ -136,6 +132,35 @@ def remove_request():
     # need the call to ZNR.get_user because delete_one returns the count
     # of items deleted instead of the json of object deleted
     return get_user_json(ZNR.get_user(body['netID']))
+
+@app.route('/api/getDriverResults')
+def get_ranked_drivers(netID,direction):
+    fetch_search = ZNR.find_previous_search(netID,direction)
+    if fetch_search != None:
+        return json.dumps(fetch_search)
+    lists = ZNR.load_all_requests()
+    if direction == 0:
+        return json.dumps(ZNR.match_users_to_uci(lists[0],lists[1]))
+    else:
+        return json.dumps(ZNR.match_users_to_home(lists[2],lists[3]))
+
+@app.route('/api/confirmRequest',methods=['POST'])
+def confirm_request():
+    if not request.json:
+        abort(400)
+
+@app.route('/api/getRideStatus')
+def get_ride_status(netID):
+    pass
+
+@app.route('/api/getRequests')
+def get_requests(netID):
+    pass
+
+@app.route('/api/endRide',methods=['POST'])
+def end_ride():
+    if not requst.json:
+        abort(400)
     
 if __name__ == '__main__':
     if DEBUG_FLAG == 'true':
