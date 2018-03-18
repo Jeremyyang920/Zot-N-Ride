@@ -2,7 +2,7 @@
 	<ion-content>
 		<div class="list card">
 			<li class="item item-toggle">
-				Arrive By				
+				Arrive At				
 				<label class="toggle toggle-balanced">
 				<input type="checkbox">
 				<div class="track">
@@ -11,23 +11,12 @@
 			</li>
 			<label class="item item-input">
 				<i class="icon ion-calendar placeholder-icon"></i>
-				<input type="text" ng-click="setStartDate()" readonly placeholder="Class Time" ng-model="getStartDateTime">
-			</label>
-			<label class="item item-input item-select">
-				<i class="icon ion-location placeholder-icon"></i>
-				<div class="input-select">
-					Location
-				</div>
-				<select> 
-					<option selected>Home 1</option>
-					<option>Home 2</option>
-				</select>
-				</label>
+				<input type="text" ng-click="setArrivalTime()" readonly placeholder="Class Time" ng-model="getArrivalTime">
 			</label>
 		</div>
 		<div class="list card">
 			<li class="item item-toggle">
-				Leave By			
+				Leave At			
 				<label class="toggle toggle-balanced">
 				<input type="checkbox">
 				<div class="track">
@@ -36,19 +25,7 @@
 			</li>
 			<label class="item item-input">
 				<i class="icon ion-calendar placeholder-icon"></i>
-				<input type="text" ng-click="setEndDate()" readonly placeholder="Departure time" ng-model="getEndDateTime">
-			</label>
-			<label class="item item-input item-select">
-				<i class="icon ion-location placeholder-icon"></i>
-				<div class="input-select">
-					Location
-				</div>
-				<select> 
-					<option selected>Parking zone 1</option>
-					<option>Parking zone 2</option>
-					<option>Parking zone 3</option>
-				</select>
-				</label>
+				<input type="text" ng-click="setDepartureTime()" readonly placeholder="Departure time" ng-model="getDepartureTime">
 			</label>
 		</div>
 	</ion-content>

@@ -2,7 +2,7 @@ API_URL = 'https://zot-n-ride.herokuapp.com';
 
 angular.module('zotnride.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $rootScope, $timeout, $ionicHistory, $ionicPlatform, $ionicPopup, $http, $cordovaGeolocation, $cordovaDatePicker) {
+.controller('AppCtrl', function($scope, $ionicModal, $rootScope, $window, $timeout, $ionicHistory, $ionicPlatform, $ionicPopup, $http, $cordovaGeolocation, $cordovaDatePicker) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -13,23 +13,17 @@ angular.module('zotnride.controllers', [])
 
   // Form data for the login modal
   $scope.loginData = {};
-  
-  // var startDateTime = new Date(new Date(new Date(new Date().setHours(new Date().getHours() + 1)).setMinutes(0)).setSeconds(0));
-  var startDateTime = moment();
-  $scope.startDateTime = startDateTime.add(1, 'hours').minute(0);
-  $scope.startDateTime = startDateTime.format('h:mm a');
-  // var endDateTime = new Date(new Date(new Date(new Date().setHours(new Date().getHours() + 2)).setMinutes(0)).setSeconds(0));
-  var endDateTime = moment().add(3, 'hours').minute(0);
-  $scope.endDateTime = endDateTime.format('h:mm a');
-  $scope.getStartDateTime = $scope.startDateTime;
-  $scope.getEndDateTime =  $scope.endDateTime;
+  $scope.user = JSON.parse($window.localStorage.getItem('user'));
 
   $ionicModal.fromTemplateUrl('templates/login.html', {
     scope: $scope,
     animation: 'slide-in-up'
   }).then(function(modal) {
     $scope.loginModal = modal;
-    $scope.loginModal.show();
+
+    if (!$scope.user || typeof $scope.user === undefined) {
+      $scope.loginModal.show();
+    }
   });
 
   $scope.closeLogin = function() {
@@ -72,7 +66,7 @@ angular.module('zotnride.controllers', [])
       },
       headers: {'Content-Type': 'application/json'}
     }).then(function successCallback(response) {
-      window.localStorage.setItem('netID', response.data.netID);
+      $window.localStorage.setItem('user', JSON.stringify(response.data));
       $scope.loginModal.hide();
     }, function errorCallback(response) {
       $scope.showLoginFailedAlert = function() {
@@ -86,76 +80,101 @@ angular.module('zotnride.controllers', [])
     });
   };
 
-  $scope.setStartDate = function() { $cordovaDatePicker.show({
-      date: $scope.startDateTime,
-      mode: 'time',
-      minDate: $scope.startDateTime,
-      allowOldDates: false,
-      minuteInterval: 30
-    }).then(function(datetime) {
-      $scope.startDateTime = datetime.toLocaleTimeString();
-      $scope.getStartDateTime = 'From: ' + $scope.startDateTime;
-      endDateTime = new Date(new Date(new Date(new Date($scope.startDateTime).setHours(new Date($scope.startDateTime).getHours() + 1)).setMinutes(0)).setSeconds(0));
-      $scope.endDateTime = endDateTime.toLocaleTimeString();
-      $scope.getEndDateTime = 'To: ' + $scope.endDateTime;
-      searchListings();
-    });
+  var getDayString = function(day) {
+    switch(day) {
+      case 0:
+      case 1:
+      case 6:
+      case 7:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+    }
   }
 
-  $scope.setEndDate = function() {
-    $cordovaDatePicker.show({
-      date: $scope.endDateTime,
-      mode: 'time',
-      minDate: $scope.startDateTime,
-      allowOldDates: false,
-      minuteInterval: 30
-    }).then(function(datetime) {
-      $scope.endDateTime = datetime.toLocaleTimeString();
-      $scope.getEndDateTime = 'To: ' + $scope.endDateTime;
-      searchListings();
-    });
+  // Autofill schedule
+  if ($scope.user.arrivals) {
+    var day = new Date().getDay();
+    var dayString = getDayString(day);
+
+    var dateObj = moment($scope.user.arrivals[dayString], 'Hmm');
+
+    if (dateObj < moment()) {
+      dayString = getDayString(day + 1);
+      $scope.arrivalTime = moment($scope.user.arrivals[dayString], 'Hmm').add(1, 'day');
+      
+      if (day === 5) {
+        $scope.arrivalTime = $scope.arrivalTime.add(2, 'day');
+      } else if (day === 6) {
+        $scope.arrivalTime = $scope.arrivalTime.add(1, 'day');
+      }
+    } else {
+      $scope.arrivalTime = dateObj;
+    }
+  } else {
+    $scope.arrivalTime = moment().add(1, 'hours').minute(0).second(0);
   }
+
+  if ($scope.user.departures) {
+    var day = new Date().getDay();
+    var dayString = getDayString(day);
+
+    var dateObj = moment($scope.user.departures[dayString], 'Hmm');
+
+    if (dateObj < moment()) {
+      dayString = getDayString(day + 1);
+      $scope.departureTime = moment($scope.user.departures[dayString], 'Hmm').add(1, 'day');
+
+      if (day === 5) {
+        $scope.departureTime = $scope.departureTime.add(2, 'day');
+      } else if (day === 6) {
+        $scope.departureTime = $scope.departureTime.add(1, 'day');
+      }
+    } else {
+      $scope.departureTime = dateObj;
+    }
+  } else {
+    $scope.departureTime = moment().add(3, 'hours').minute(0).second(0);
+  }
+
+  // Watch the values and update them when changed
+  $scope.$watch('arrivalTime', function() {
+    $scope.getArrivalTime = moment($scope.arrivalTime).calendar();
+  })
+
+  $scope.$watch('departureTime', function() {
+    $scope.getDepartureTime = moment($scope.departureTime).calendar();
+  })
 
   $ionicPlatform.ready(function() {
-    // Get device location
-    $cordovaGeolocation.getCurrentPosition({
-      enableHighAccuracy: false
-    }).then(function(position) {
-      $scope.lat = position.coords.latitude;
-      $scope.lng = position.coords.longitude;
-    }, function(err) {
-      console.log(err);
-    })
-
     // Datepicker
-    $scope.setStartDate = function() {
+    $scope.setArrivalTime = function() {
       $cordovaDatePicker.show({
-        date: $scope.startDateTime,
-        mode: 'datetime',
-        minDate: $scope.startDateTime,
+        date: $scope.arrivalTime,
+        mode: 'time',
+        minDate: Date,
         allowOldDates: false,
         minuteInterval: 30
       }).then(function(datetime) {
-        $scope.startDateTime = datetime.toDateString() + ' ' + datetime.toLocaleTimeString();
-        $scope.getStartDateTime = 'From: ' + $scope.startDateTime;
-        endDateTime = new Date(new Date(new Date(new Date($scope.startDateTime).setHours(new Date($scope.startDateTime).getHours() + 1)).setMinutes(0)).setSeconds(0));
-        $scope.endDateTime = endDateTime.toDateString() + ' ' + endDateTime.toLocaleTimeString();
-        $scope.getEndDateTime = 'To: ' + $scope.endDateTime;
-        searchListings();
+        $scope.arrivalTime = moment(datetime);
       });
     }
 
-    $scope.setEndDate = function() {
+    $scope.setDepartureTime = function() {
       $cordovaDatePicker.show({
-        date: $scope.endDateTime,
-        mode: 'datetime',
-        minDate: $scope.startDateTime,
+        date: $scope.departureTime,
+        mode: 'time',
+        minDate: Date,
         allowOldDates: false,
         minuteInterval: 30
       }).then(function(datetime) {
-        $scope.endDateTime = datetime.toDateString() + ' ' + datetime.toLocaleTimeString();
-        $scope.getEndDateTime = 'To: ' + $scope.endDateTime;
-        searchListings();
+        $scope.departureTime = moment(datetime);
       });
     }
   });
@@ -165,7 +184,7 @@ angular.module('zotnride.controllers', [])
   $scope.registrationData = {};
 
   $scope.registerAccount = function() {
-  
+    
   }
 })
 

@@ -3,7 +3,7 @@
         <p>Upload your schedules .ical file from EEE to automatically match with other users.</p>
         <form action="/file-upload" class="dropzone dz-clickable" id="ical-dropzone">
             <div class="fallback">
-                <input name="file" type="file" multiple />
+                <input name="file" type="file" ng-model="filepath" ng-change="updateFile($files)" />
             </div>
         </form>
         <button class="button button-block button-positive" type="submit" ng-click="uploadSchedule()">Upload</button>
