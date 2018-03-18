@@ -1,28 +1,18 @@
 <ion-view view-title="Zot-N-Ride">
 	<ion-content>
 		<div class="list card">
-			<li class="item item-toggle">
-				Arrive At				
-				<label class="toggle toggle-balanced">
-				<input type="checkbox">
-				<div class="track">
-					<div class="handle"></div>
-				</div>
-			</li>
+			<ion-toggle ng-model="activatedArrival" ng-change="toggleRequest(0)">
+				Arrive School At
+			</ion-toggle>
 			<label class="item item-input">
 				<i class="icon ion-calendar placeholder-icon"></i>
 				<input type="text" ng-click="setArrivalTime()" readonly placeholder="Class Time" ng-model="getArrivalTime">
 			</label>
 		</div>
 		<div class="list card">
-			<li class="item item-toggle">
-				Leave At			
-				<label class="toggle toggle-balanced">
-				<input type="checkbox">
-				<div class="track">
-					<div class="handle"></div>
-				</div>
-			</li>
+			<ion-toggle ng-model="activatedDeparture" ng-change="toggleRequest(1)">
+				Leave School At
+			</ion-toggle>
 			<label class="item item-input">
 				<i class="icon ion-calendar placeholder-icon"></i>
 				<input type="text" ng-click="setDepartureTime()" readonly placeholder="Departure time" ng-model="getDepartureTime">

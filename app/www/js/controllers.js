@@ -1,4 +1,4 @@
-API_URL = 'https://zot-n-ride.herokuapp.com';
+API_URL = 'https://zot-n-ride-dev.herokuapp.com';
 
 angular.module('zotnride.controllers', [])
 
@@ -180,6 +180,61 @@ angular.module('zotnride.controllers', [])
       });
     }
   });
+
+  $scope.activatedArrival = false;
+  $scope.activatedDeparture = false;
+
+  $scope.toggleRequest = function(direction) {
+    var endpoint, data = {};
+    data.netID = $scope.user.netID;
+    data.direction = direction;
+
+    if (direction === 0) {
+      if (!$scope.activatedArrival) {
+        endpoint = '/api/addRequest';
+        data.time = $scope.arrivalTime.unix();
+      } else {
+        endpoint = '/api/removeRequest';
+      }
+
+      $scope.activatedArrival = !$scope.activatedArrival;
+    } else {
+      if (!$scope.activatedDeparture) {
+        endpoint = '/api/addRequest';
+        data.time = $scope.arrivalTime.unix();
+      } else {
+        endpoint = '/api/removeRequest';
+      }
+
+      $scope.activatedDeparture = !$scope.activatedDeparture;
+    }
+
+    $http({
+      method: 'POST',
+      url: API_URL + endpoint,
+      data: data,
+      headers: {'Content-Type': 'application/json'}
+    }).then(function successCallback(response) {
+      console.log(response);
+    }, function errorCallback(response) {
+      console.log(response);
+
+      if (direction === 0) {
+        $scope.activatedArrival = !$scope.activatedArrival;
+      } else {
+        $scope.activatedDeparture = !$scope.activatedDeparture;
+      }
+
+      $scope.showRequestFailedAlert = function() {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Request failed!',
+          template: 'Something went wrong.'
+        });
+      };
+
+      $scope.showRequestFailedAlert();
+    });
+  }
 })
 
 .controller('RegistrationCtrl', function($scope, $stateParams, $http) {
