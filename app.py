@@ -143,9 +143,11 @@ def get_requests(netID,direction):
     direction_number = int(direction)
     if direction_number >= 2:
         abort(400)
+    '''
     fetch_search = ZNR.find_previous_search(netID,direction_number)
     if fetch_search != None:
         return json.dumps(fetch_search[netID])
+    '''
     lists = ZNR.load_all_requests()
     if direction_number == 0:
         return json.dumps(ZNR.match_users_to_uci(lists[0],lists[1])[netID])
