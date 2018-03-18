@@ -182,6 +182,8 @@ def find_previous_search(netID:str, direction:int) -> dict:
 
 def is_driver(netID:str) -> bool:
     user = users.find_one({'netID':netID})
+    if user == None:
+        return False
     return user['isDriver']
 
 def remove_users_from_request_pool(driverID:str,riderID:str,direction:int) -> None:
@@ -191,7 +193,9 @@ def remove_users_from_request_pool(driverID:str,riderID:str,direction:int) -> No
 def add_match(driverID:str,riderID:str,direction:int) -> dict:
     new_match = dict()
     if matches.find_one({'driverID':driverID,'riderID':riderID,'direction':direction}) == None:
-        new_match = matches.insert_one({'driverID':driverID,'riderID':riderID,'direction':direction})
+        driver_request = requests.find_one({'driverID':driverID,'direction':direction}):
+        if driver_request != None:
+            new_match = matches.insert_one({'driverID':driverID,'riderID':riderID,'direction':direction,'time':driver_request['time']})
     return new_match
 
 def remove_match(driverID:str,riderID:str,direction:int) -> bool:
