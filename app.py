@@ -170,9 +170,10 @@ def confirm_request():
         return json.dumps({'message':'Successfully matched {} with {} when going home.'.format(body['driverID'],body['riderID'])})
 
 # Endpoint to Display User's Ride Status
-@app.route('/api/getRideStatus')
+@app.route('/api/getRideStatus/<netID>')
 def get_ride_status(netID):
-    pass
+    result = dict()
+    return json.dumps(result)
 
 # Endpoint to Remove Match
 @app.route('/api/endRide',methods=['POST'])
