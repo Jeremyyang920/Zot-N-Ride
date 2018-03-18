@@ -135,11 +135,12 @@ def remove_request():
 
 @app.route('/api/getDriverResults/<netID>/<direction>')
 def get_ranked_drivers(netID,direction):
-    fetch_search = ZNR.find_previous_search(netID,direction)
+    direction_number = int(direction)
+    fetch_search = ZNR.find_previous_search(netID,direction_number)
     if fetch_search != None:
         return json.dumps(fetch_search[netID])
     lists = ZNR.load_all_requests()
-    if direction == 0:
+    if direction_number == 0:
         return json.dumps(ZNR.match_users_to_uci(lists[0],lists[1])[netID])
     else:
         return json.dumps(ZNR.match_users_to_home(lists[2],lists[3])[netID])
