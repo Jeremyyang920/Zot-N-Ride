@@ -35,7 +35,7 @@ def match_users_to_uci(riders:list, drivers:list) -> dict:
             driver,driver_time = driver_tuple
             delta_route = abs(calc_detour_time_to_uci(driver['address'],rider['address'],rider['time_to_uci']) - driver['time_to_uci'])
             delta_arrival = abs(rider_time - driver_time)
-            result[rider['netID']][driver['netID']] = delta_route + delta_arrival
+            result[driver['netID']][rider['netID']] = delta_route + delta_arrival
     ranked_results = rank_matches(result)
     for k,v in ranked_results.items():
         if rider_searches.find_one({'riderID':k,'direction':0}) == None:
@@ -50,7 +50,7 @@ def match_users_to_home(riders:list, drivers:list) -> dict:
             driver,driver_time = driver_tuple
             delta_route = abs(calc_detour_time_to_home(driver['address'],rider['address'],rider['time_to_home']) - driver['time_to_home'])
             delta_departure = abs(rider_time - driver_time)
-            result[rider['netID']][driver['netID']] = delta_route + delta_departure
+            result[driver['netID']][rider['netID']] = delta_route + delta_departure
     ranked_results = rank_matches(result)
     for k,v in ranked_results.items():
         if rider_searches.find_one({'riderID':k,'direction':1}) == None:
@@ -168,8 +168,12 @@ def add_user_request(netID:str, direction:int, time:int) -> dict:
     requests.insert_one({'netID':netID,'direction':direction,'time':time})
     return get_user(netID)
 
-def find_previous_search(netID:str, direction:int):
+def find_previous_search(netID:str, direction:int) -> dict:
     return rider_searches.find_one({'netID':netID,'direction':direction})
+
+def is_driver(netID:str):
+    user = users.find_one({'netID':netID})
+    return user['isDriver']
     
 def remove_user_request(netID:str, direction:int) -> int:
     # this function assumes that a user will only have one "to" and one "from" request (no duplicates)

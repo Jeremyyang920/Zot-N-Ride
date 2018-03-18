@@ -133,18 +133,6 @@ def remove_request():
     # of items deleted instead of the json of object deleted
     return get_user_json(ZNR.get_user(body['netID']))
 
-@app.route('/api/getDriverResults/<netID>/<direction>')
-def get_ranked_drivers(netID,direction):
-    direction_number = int(direction)
-    fetch_search = ZNR.find_previous_search(netID,direction_number)
-    if fetch_search != None:
-        return json.dumps(fetch_search[netID])
-    lists = ZNR.load_all_requests()
-    if direction_number == 0:
-        return json.dumps(ZNR.match_users_to_uci(lists[0],lists[1])[netID])
-    else:
-        return json.dumps(ZNR.match_users_to_home(lists[2],lists[3])[netID])
-
 @app.route('/api/confirmRequest',methods=['POST'])
 def confirm_request():
     if not request.json:
@@ -154,9 +142,20 @@ def confirm_request():
 def get_ride_status(netID):
     pass
 
-@app.route('/api/getRequests')
-def get_requests(netID):
-    pass
+@app.route('/api/getRequests/<netID>/<direction>')
+def get_requests(netID,direction):
+    if not ZNR.is_driver(netID):
+        abort(400)
+    direction_number = int(direction)
+    fetch_search = ZNR.find_previous_search(netID,direction_number)
+    if fetch_search != None:
+        return json.dumps(fetch_search[netID])
+    lists = ZNR.load_all_requests()
+    if direction_number == 0:
+        return json.dumps(ZNR.match_users_to_uci(lists[0],lists[1])[netID])
+    else:
+        return json.dumps(ZNR.match_users_to_home(lists[2],lists[3])[netID])
+    
 
 @app.route('/api/endRide',methods=['POST'])
 def end_ride():
