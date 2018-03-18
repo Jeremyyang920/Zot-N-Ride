@@ -137,12 +137,12 @@ def remove_request():
 def get_ranked_drivers(netID,direction):
     fetch_search = ZNR.find_previous_search(netID,direction)
     if fetch_search != None:
-        return json.dumps(fetch_search)
+        return json.dumps(fetch_search[netID])
     lists = ZNR.load_all_requests()
     if direction == 0:
-        return json.dumps(ZNR.match_users_to_uci(lists[0],lists[1]))
+        return json.dumps(ZNR.match_users_to_uci(lists[0],lists[1])[netID])
     else:
-        return json.dumps(ZNR.match_users_to_home(lists[2],lists[3]))
+        return json.dumps(ZNR.match_users_to_home(lists[2],lists[3])[netID])
 
 @app.route('/api/confirmRequest',methods=['POST'])
 def confirm_request():
