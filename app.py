@@ -155,7 +155,7 @@ def confirm_request():
     query = ZNR.add_match(body['driverID'],body['riderID'],body['direction'])
     if not query:
         abort(400)
-    return json.dumps(query)
+    return query
 
 @app.route('/api/getRideStatus')
 def get_ride_status(netID):
