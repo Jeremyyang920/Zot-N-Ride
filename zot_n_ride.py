@@ -200,7 +200,7 @@ def add_match(driverID:str,riderID:str,direction:int) -> dict:
                 for rider in search_request['rankedMatches']:
                     if rider['riderID'] == riderID:
                         new_match = matches.insert_one({'driverID':driverID,'riderID':riderID,'direction':direction,
-                                                        'time':driver_request['time'],'riderInfo':rider['results']})
+                                                        'time':driver_request['time'],'calculations':rider['results']})
     return new_match
 
 def remove_match(driverID:str,riderID:str,direction:int) -> bool:
@@ -214,14 +214,14 @@ def get_rides(netID:str) -> dict:
     for match in matches.find({}):
         if match['riderID'] == netID:
             if match['direction'] == 0:
-                result['toSchool'] = {'driverID':match['driverID']}
+                result['toSchool'] = {'driverID':match['driverID'],'pickupTime':match['time'],'calculations':match['calculations']}
             elif match['direction'] == 1:
-                result['fromSchool'] = {'driverID':match['driverID']}
+                result['fromSchool'] = {'driverID':match['driverID'],'pickupTime':match['time'],'calculations':match['calculations']}
         elif match['driverID'] == netID:
             if match['direction'] == 0:
-                result['toSchool'] = {'riderID':match['riderID']}
+                result['toSchool'] = {'riderID':match['riderID'],'pickupTime':match['time'],'calculations':match['calculations']}
             elif match['direction'] == 1:
-                result['fromSchool'] = {'riderID':match['riderID']}
+                result['fromSchool'] = {'riderID':match['riderID'],'pickupTime':match['time'],'calculations':match['calculations']}
     return result
 
 def confirm_email(u:user.User) -> None:
