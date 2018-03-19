@@ -195,7 +195,12 @@ def add_match(driverID:str,riderID:str,direction:int) -> dict:
     if matches.find_one({'driverID':driverID,'riderID':riderID,'direction':direction}) == None:
         driver_request = requests.find_one({'netID':driverID,'direction':direction})
         if driver_request != None:
-            new_match = matches.insert_one({'driverID':driverID,'riderID':riderID,'direction':direction,'time':driver_request['time']})
+            search_request = searches.find_one({'driverID':driverID,'direction':direction})
+            if search_request != None:
+                for rider in search_request['rankedResults']:
+                    if rider['riderID'] == riderID:
+                        new_match = matches.insert_one({'driverID':driverID,'riderID':riderID,'direction':direction,
+                                                        'time':driver_request['time'],'riderInfo':rider['results']})
     return new_match
 
 def remove_match(driverID:str,riderID:str,direction:int) -> bool:
