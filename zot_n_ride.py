@@ -197,7 +197,7 @@ def add_match(driverID:str,riderID:str,direction:int) -> dict:
         if driver_request != None:
             search_request = searches.find_one({'driverID':driverID,'direction':direction})
             if search_request != None:
-                for rider in search_request['rankedResults']:
+                for rider in search_request['rankedMatches']:
                     if rider['riderID'] == riderID:
                         new_match = matches.insert_one({'driverID':driverID,'riderID':riderID,'direction':direction,
                                                         'time':driver_request['time'],'riderInfo':rider['results']})
