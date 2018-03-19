@@ -224,6 +224,12 @@ def get_rides(netID:str) -> dict:
                 result['fromSchool'] = {'riderID':match['riderID'],'pickupTime':match['time'],'calculations':match['calculations']}
     return result
 
+def time_stamp_converter(unixTime:str):
+    newTime=datetime.datetime.fromtimestamp(
+        int(unixTime)
+    ).strftime('%H%M')
+    return int(newTime)
+    
 def confirm_email(u:user.User) -> None:
     sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
     from_email = Email('confirm_email@zotnride.stream')
