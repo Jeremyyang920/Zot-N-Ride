@@ -224,10 +224,8 @@ def get_rides(netID:str) -> dict:
                 result['fromSchool'] = {'riderID':match['riderID'],'pickupTime':match['time'],'calculations':match['calculations']}
     return result
 
-def time_stamp_converter(unixTime:str):
-    newTime=datetime.datetime.fromtimestamp(
-        int(unixTime)
-    ).strftime('%H%M')
+def time_stamp_converter(unixTime:int):
+    newTime=datetime.datetime.fromtimestamp(unixTime).strftime('%H%M')
     return int(newTime)
     
 def confirm_email(u:user.User) -> None:
