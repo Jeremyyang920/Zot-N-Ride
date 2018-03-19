@@ -1,8 +1,9 @@
-<ion-view view-title="Zot-N-Ride">
-	<ion-content>
+<ion-view view-title="">
+	<ion-content class="home">
+		<img src="img/logo-speed.png" class="logo"/>
 		<div class="list card">
 			<ion-toggle ng-model="activatedArrival" ng-change="toggleRequest(0)">
-				Arrive School At
+				Arrive To School
 			</ion-toggle>
 			<label class="item item-input">
 				<i class="icon ion-calendar placeholder-icon"></i>
@@ -15,7 +16,7 @@
 		</div>
 		<div class="list card">
 			<ion-toggle ng-model="activatedDeparture" ng-change="toggleRequest(1)">
-				Leave School At
+				Leave School 
 			</ion-toggle>
 			<label class="item item-input">
 				<i class="icon ion-calendar placeholder-icon"></i>

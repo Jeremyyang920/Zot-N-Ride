@@ -31,3 +31,16 @@ input[readonly]:not(.cloned-text-input) {
 #reservation {
 	margin: 10px 20px;
 }
+
+.home{
+    background: -webkit-gradient(top, rgb(231, 97, 120), #f5c395);
+    background: -o-linear-gradient(bottom, rgb(231, 97, 120), #f5c395);
+    background: -moz-linear-gradient(bottom, rgb(231, 97, 120), #f5c395);
+    background: linear-gradient(to bottom, rgb(231, 97, 120), #f5c395);
+}
+
+.logo{
+	width: 90%;
+	display: block;
+	margin: 30px auto;
+}
