@@ -214,9 +214,9 @@ def get_rides(netID:str) -> dict:
     for request in requests.find({}):
         if request['netID'] == netID: 
             if request['direction'] == 0:
-                result['toSchool'] = {}
+                result['toSchool'] = {'requestedTime':request['time']}
             elif request['direction'] == 1:
-                result['fromSchool'] = {}
+                result['fromSchool'] = {'requestedTime':request['time']}
     for match in matches.find({}):
         if match['riderID'] == netID:
             if match['direction'] == 0:
