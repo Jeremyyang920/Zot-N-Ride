@@ -21,3 +21,16 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 
+$GRADIENT_TOP: #A23C4B;
+$GRADIENT_BOTTOM: #ff9068;
+$GRADIENT_TRANSPARENCY: rgba(255,255,255,0.4);
+
+
+.home{
+    background: -webkit-gradient(left top, $GRADIENT_TOP, $GRADIENT_BOTTOM);
+    background: -o-linear-gradient(bottom right, $GRADIENT_TOP, $GRADIENT_BOTTOM);
+    background: -moz-linear-gradient(bottom right, $GRADIENT_TOP, $GRADIENT_BOTTOM);
+    background: linear-gradient(to bottom right, $GRADIENT_TOP, $GRADIENT_BOTTOM);
+}
+
+

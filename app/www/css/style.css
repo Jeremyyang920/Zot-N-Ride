@@ -1,33 +1,21 @@
-.scroll {
-	min-height: 100%;
+.home {
+	background: -webkit-gradient(top, rgb(231, 97, 120), #f5c395);
+	background: -o-linear-gradient(bottom, rgb(231, 97, 120), #f5c395);
+	background: -moz-linear-gradient(bottom, rgb(231, 97, 120), #f5c395);
+	background: linear-gradient(to bottom, rgb(231, 97, 120), #f5c395);
 }
 
-.main-list {
-	margin-top: 20px;
-	margin-bottom: 0;
+.logo {
+	width: 90%;
+	display: block;
+	margin: 30px auto;
 }
 
-.main-list+.main-list {
-	margin: 10px;
+.timepicker {
+	background-color: #fff !important;
 }
 
-.listing-details {
-	padding: 3.5% 5% 50px 5%;
-}
-
-input[readonly]:not(.cloned-text-input) {
-	background: inherit;
-}
-
-#reserve h3, #reserve h4 {
-	margin: 10px 15px;
-}
-
-#reserve hr {
-	width: 95%;
-	margin: 20px 10px;
-}
-
-#reservation {
-	margin: 10px 20px;
+.button-cta {
+	width: 100%;
+	text-align: left;
 }

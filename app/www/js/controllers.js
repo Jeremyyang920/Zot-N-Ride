@@ -1,8 +1,8 @@
-API_URL = 'https://zot-n-ride.herokuapp.com';
+API_URL = 'https://zot-n-ride-dev.herokuapp.com';
 
 angular.module('zotnride.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $rootScope, $timeout, $ionicHistory, $ionicPlatform, $ionicPopup, $http, $cordovaGeolocation, $cordovaDatePicker) {
+.controller('AppCtrl', function($scope, $ionicModal, $rootScope, $window, $timeout, $ionicHistory, $ionicPlatform, $ionicPopup, $http, $cordovaGeolocation, $cordovaDatePicker, $cordovaLaunchNavigator) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -11,16 +11,19 @@ angular.module('zotnride.controllers', [])
   //$scope.$on('$ionicView.enter', function(e) {
   //});
 
-  // Form data for the login modal
   $scope.loginData = {};
-  
+  $scope.user = JSON.parse($window.localStorage.getItem('user'));
 
+  // Login modal
   $ionicModal.fromTemplateUrl('templates/login.html', {
     scope: $scope,
     animation: 'slide-in-up'
   }).then(function(modal) {
     $scope.loginModal = modal;
-    $scope.loginModal.show();
+
+    if (!$scope.user || typeof $scope.user === undefined) {
+      $scope.loginModal.show();
+    }
   });
 
   $scope.closeLogin = function() {
@@ -33,26 +36,6 @@ angular.module('zotnride.controllers', [])
     $scope.loginModal.show();
   };
 
-  // Reserve Modal
-  $ionicModal.fromTemplateUrl('templates/reserve.html', {
-    scope: $scope,
-    animation: 'slide-in-up'
-  }).then(function(modal) {
-    $scope.reserveModal = modal;
-  });
-
-  $scope.closeReserve = function() {
-    $scope.reserveModal.hide();
-  };
-
-  $scope.showReserve = function() {
-    if (window.localStorage.getItem('uid') === null || window.localStorage.getItem('uid') === '') {
-      $scope.loginModal.show();
-    } else
-    $scope.reserveModal.show();
-  };
-
-  // Perform login
   $scope.doLogin = function() {
     $http({
       method: 'POST',
@@ -63,81 +46,375 @@ angular.module('zotnride.controllers', [])
       },
       headers: {'Content-Type': 'application/json'}
     }).then(function successCallback(response) {
-      if (response.status === 400) {
-        $scope.showLoginFailedAlert = function() {
-          var alertPopup = $ionicPopup.alert({
-            title: 'Login Failed',
-            template: 'Email/password is incorrect.'
-          });
-        };
-
-        $scope.showLoginFailedAlert();
-      } else {
-        window.localStorage.setItem('netID', response.data.netID);
-        $scope.loginModal.hide();
-      }
+      $scope.user = response.data;
+      $window.localStorage.setItem('user', JSON.stringify(response.data));
+      $scope.loginModal.hide();
+      getRideStatus();
     }, function errorCallback(response) {
-      console.log(JSON.stringify(response));
+      $scope.showLoginFailedAlert = function() {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Login Failed',
+          template: 'Email/password is incorrect.'
+        });
+      };
+
+      $scope.showLoginFailedAlert();
     });
   };
 
-  $ionicPlatform.ready(function() {
-    // Get device location
-    $cordovaGeolocation.getCurrentPosition({
-      enableHighAccuracy: false
-    }).then(function(position) {
-      $scope.lat = position.coords.latitude;
-      $scope.lng = position.coords.longitude;
-    }, function(err) {
-      console.log(err);
-    })
+  $scope.logout = function() {
+    $scope.user = null;
+    $window.localStorage.removeItem('user');
+    $scope.loginModal.show();
+  }
 
-    // Datepicker
-    $scope.setStartDate = function() {
+  // Requests modal
+  $scope.showRequests = function(direction) {
+    $ionicModal.fromTemplateUrl('templates/requests.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      $scope.requestModal = modal;
+      $scope.requestDirection = direction;
+      $scope.requestModal.show();
+    })
+  };
+  
+  $scope.closeRequests = function() {
+    $scope.requestModal.hide();
+  }
+
+  // Profile Modal
+  $scope.showProfile = function(user) {
+    $ionicModal.fromTemplateUrl('templates/profile.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      $http({
+        method: 'GET',
+        url: API_URL + '/api/user/' + user
+      }).then(function successCallback(response) {
+        $scope.otherUser = response.data;
+      })
+      $scope.profileModal = modal;
+      $scope.profileModal.show();
+    });
+  }
+
+  $scope.closeProfile = function() {
+    $scope.profileModal.hide();
+  };
+
+  // Time formatters
+  $scope.getReadableTime = function(someNumber) {
+    return Math.ceil(someNumber);
+  }
+
+  $scope.formatTime = function(timestamp) {
+    return moment.unix(timestamp).calendar();
+  }
+
+  // Get ride status, recursively calls itself every 30 seconds
+  var getRideStatus = function() {
+    if ($scope.user) {
+      $http({
+        method: 'GET',
+        url: API_URL + '/api/getRideStatus/' + $scope.user.netID
+      }).then(function successCallback(response) {
+        $scope.rideStatus = response.data;
+
+        if (response.data.toSchool) {
+          $scope.activatedArrival = true;
+          $scope.arrivalTime = moment.unix(response.data.toSchool.requestedTime);
+
+          if (response.data.toSchool.riderID) {
+            $http({
+              method: 'GET',
+              url: API_URL + '/api/user/' + response.data.toSchool.riderID
+            }).then(function successCallback(response) {
+              $scope.toSchoolRider = response.data;
+            })
+          }
+
+          if (response.data.toSchool.driverID) {
+            $http({
+              method: 'GET',
+              url: API_URL + '/api/user/' + response.data.toSchool.driverID
+            }).then(function successCallback(response) {
+              $scope.toSchoolDriver = response.data;
+            })
+          }
+        }
+
+        if (response.data.fromSchool) {
+          $scope.activatedDeparture = true;
+          $scope.departureTime = moment.unix(response.data.fromSchool.requestedTime);
+
+          if (response.data.fromSchool.riderID) {
+            $http({
+              method: 'GET',
+              url: API_URL + '/api/user/' + response.data.fromSchool.riderID
+            }).then(function successCallback(response) {
+              $scope.fromSchoolRider = response.data;
+            })
+          }
+
+          if (response.data.fromSchool.driverID) {
+            $http({
+              method: 'GET',
+              url: API_URL + '/api/user/' + response.data.fromSchool.driverID
+            }).then(function successCallback(response) {
+              $scope.fromSchoolDriver = response.data;
+            })
+          }
+        }
+
+        if ($scope.user.isDriver && $scope.activatedArrival && !response.data.toSchool.riderID) {
+          getToRequests();
+        }
+
+        if ($scope.user.isDriver && $scope.activatedDeparture && !response.data.fromSchool.riderID) {
+          getFromRequests();
+        }
+
+        $timeout(getRideStatus, 30000);
+      })
+    }
+  }
+
+  // Get all rider requests to school (drivers only)
+  var getToRequests = function() {
+    $http({
+      method: 'GET',
+      url: API_URL + '/api/getRequests/' + $scope.user.netID + '/0'
+    }).then(function successCallback(response) {
+      $scope.toSchool = response.data;
+    })
+  }
+
+  // Get all rider requests from school (drivers only)
+  var getFromRequests = function() {
+    $http({
+      method: 'GET',
+      url: API_URL + '/api/getRequests/' + $scope.user.netID + '/1'
+    }).then(function successCallback(response) {
+      $scope.fromSchool = response.data;
+    })
+  }
+
+  // Begin recursive call if user is logged in
+  if ($scope.user) {
+    getRideStatus();
+  }
+
+  // Convert Date.getDay() number [0-6] to its string representations
+  var getDayString = function(day) {
+    switch(day) {
+      case 0:
+      case 1:
+      case 6:
+      case 7:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+    }
+  }
+
+  // Autofill arrival schedule (to school)
+  if ($scope.user && $scope.user.arrivals) {
+    var day = new Date().getDay();
+    var dayString = getDayString(day);
+
+    var dateObj = moment($scope.user.arrivals[dayString], 'Hmm');
+
+    if (dateObj < moment()) {
+      dayString = getDayString(day + 1);
+      $scope.arrivalTime = moment($scope.user.arrivals[dayString], 'Hmm').add(1, 'day');
+      
+      if (day === 5) {
+        $scope.arrivalTime = $scope.arrivalTime.add(2, 'day');
+      } else if (day === 6) {
+        $scope.arrivalTime = $scope.arrivalTime.add(1, 'day');
+      }
+    } else {
+      $scope.arrivalTime = dateObj;
+    }
+  } else {
+    $scope.arrivalTime = moment().add(1, 'hours').minute(0).second(0);
+  }
+
+  // Autofill departure schedule (from school)
+  if ($scope.user && $scope.user.departures) {
+    var day = new Date().getDay();
+    var dayString = getDayString(day);
+
+    var dateObj = moment($scope.user.departures[dayString], 'Hmm');
+
+    if (dateObj < moment()) {
+      dayString = getDayString(day + 1);
+      $scope.departureTime = moment($scope.user.departures[dayString], 'Hmm').add(1, 'day');
+
+      if (day === 5) {
+        $scope.departureTime = $scope.departureTime.add(2, 'day');
+      } else if (day === 6) {
+        $scope.departureTime = $scope.departureTime.add(1, 'day');
+      }
+    } else {
+      $scope.departureTime = dateObj;
+    }
+  } else {
+    $scope.departureTime = moment().add(3, 'hours').minute(0).second(0);
+  }
+
+  // Watch the values and update them when changed
+  $scope.$watch('arrivalTime', function() {
+    $scope.getArrivalTime = moment($scope.arrivalTime).calendar();
+  })
+
+  $scope.$watch('departureTime', function() {
+    $scope.getDepartureTime = moment($scope.departureTime).calendar();
+  })
+
+  $ionicPlatform.ready(function() {
+    // Timepickers
+    $scope.setArrivalTime = function() {
       $cordovaDatePicker.show({
-        date: $scope.startDateTime,
+        date: $scope.arrivalTime,
         mode: 'datetime',
-        minDate: $scope.startDateTime,
+        minDate: Date,
+        maxDate: moment().add(1, 'day').endOf('day'),
         allowOldDates: false,
         minuteInterval: 30
       }).then(function(datetime) {
-        $scope.startDateTime = datetime.toDateString() + ' ' + datetime.toLocaleTimeString();
-        $scope.getStartDateTime = 'From: ' + $scope.startDateTime;
-        endDateTime = new Date(new Date(new Date(new Date($scope.startDateTime).setHours(new Date($scope.startDateTime).getHours() + 1)).setMinutes(0)).setSeconds(0));
-        $scope.endDateTime = endDateTime.toDateString() + ' ' + endDateTime.toLocaleTimeString();
-        $scope.getEndDateTime = 'To: ' + $scope.endDateTime;
-        searchListings();
+        $scope.arrivalTime = moment(datetime);
       });
     }
 
-    $scope.setEndDate = function() {
+    $scope.setDepartureTime = function() {
       $cordovaDatePicker.show({
-        date: $scope.endDateTime,
+        date: $scope.departureTime,
         mode: 'datetime',
-        minDate: $scope.startDateTime,
+        minDate: Date,
+        maxDate: moment().add(1, 'day').endOf('day'),
         allowOldDates: false,
         minuteInterval: 30
       }).then(function(datetime) {
-        $scope.endDateTime = datetime.toDateString() + ' ' + datetime.toLocaleTimeString();
-        $scope.getEndDateTime = 'To: ' + $scope.endDateTime;
-        searchListings();
+        $scope.departureTime = moment(datetime);
       });
+    }
+
+    // Launch navigation app
+    $scope.navigate = function(address) {
+      $cordovaLaunchNavigator.navigate(address);
     }
   });
+
+  // Initialize the toggles to `false` so toggleRequest works
+  $scope.activatedArrival = false;
+  $scope.activatedDeparture = false;
+
+  // Accept rider requests (drivers only)
+  $scope.acceptRequest = function(direction, riderID) {
+    $http({
+      method: 'POST',
+      url: API_URL + '/api/confirmRequest',
+      data: {
+        netID: $scope.user.netID,
+        riderID: riderID,
+        direction: direction
+      },
+      headers: {'Content-Type': 'application/json'}
+    }).then(function successCallback(response) {
+      $scope.requestModal.hide();
+    }, function errorCallback(response) {
+      $scope.showAcceptanceFailedAlert = function() {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Acceptance Failed',
+          template: 'Something went wrong!'
+        });
+      };
+
+      $scope.showAcceptanceFailedAlert();
+    });
+  }
+
+  // Toggle requests
+  $scope.toggleRequest = function(direction) {
+    var endpoint, data = {};
+    data.netID = $scope.user.netID;
+    data.direction = direction;
+
+    // 0 = to school, 1 = from school
+    if (direction === 0) {
+      if (!$scope.activatedArrival) {
+        endpoint = '/api/addRequest';
+        data.time = $scope.arrivalTime.unix();
+      } else if ($scope.rideStatus.toSchool.riderID || $scope.rideStatus.toSchool.driverID) {
+        endpoint = '/api/endRide';
+      } else {
+        endpoint = '/api/removeRequest';
+      }
+
+      $scope.activatedArrival = !$scope.activatedArrival;
+    } else {
+      if (!$scope.activatedDeparture) {
+        endpoint = '/api/addRequest';
+        data.time = $scope.arrivalTime.unix();
+      } else if ($scope.rideStatus.fromSchool.riderID || $scope.rideStatus.fromSchool.driverID) {
+        endpoint = '/api/endRide';
+      } else {
+        endpoint = '/api/removeRequest';
+      }
+
+      $scope.activatedDeparture = !$scope.activatedDeparture;
+    }
+
+    $http({
+      method: 'POST',
+      url: API_URL + endpoint,
+      data: data,
+      headers: {'Content-Type': 'application/json'}
+    }).then(function successCallback(response) {
+      console.log(response);
+    }, function errorCallback(response) {
+      console.log(response);
+
+      if (direction === 0) {
+        $scope.activatedArrival = !$scope.activatedArrival;
+      } else {
+        $scope.activatedDeparture = !$scope.activatedDeparture;
+      }
+
+      $scope.showRequestFailedAlert = function() {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Request failed!',
+          template: 'Something went wrong.'
+        });
+      };
+
+      $scope.showRequestFailedAlert();
+    });
+  }
 })
 
 .controller('RegistrationCtrl', function($scope, $stateParams, $http) {
   $scope.registrationData = {};
 
   $scope.registerAccount = function() {
-
+    
   }
 })
 
-.controller('UploadCtrl', function($scope, $stateParams, $rootScope, $ionicPlatform, $ionicHistory) {
-  $ionicPlatform.ready(function() {
-    var myDropzone = new Dropzone("#ical-dropzone", { url: "/file/post"});
-  });
+.controller('UploadCtrl', function($scope, $stateParams, $rootScope, $ionicHistory) {
+  if (document.getElementById('DropzoneElementId')) {
+    var myDropzone = new Dropzone("div#ical-dropzone", { url: "/file/post"});
+  }
 
   $scope.goHome = function(){
     $ionicHistory.goBack(-2);

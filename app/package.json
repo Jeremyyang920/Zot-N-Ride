@@ -3,11 +3,22 @@
   "version": "1.0.0",
   "description": "zotnride",
   "dependencies": {
+    "cordova-ios": "^4.5.4",
+    "cordova-plugin-actionsheet": "^2.3.3",
+    "cordova-plugin-console": "^1.1.0",
+    "cordova-plugin-datepicker": "git+https://github.com/VitaliiBlagodir/cordova-plugin-datepicker.git",
+    "cordova-plugin-device": "^2.0.1",
+    "cordova-plugin-dialogs": "^2.0.1",
+    "cordova-plugin-splashscreen": "^5.0.2",
+    "cordova-plugin-statusbar": "^2.4.1",
+    "cordova-plugin-whitelist": "^1.3.3",
     "gulp": "^3.5.6",
     "gulp-concat": "^2.2.0",
     "gulp-minify-css": "^0.3.0",
     "gulp-rename": "^1.2.0",
-    "ngdropzone": "^2.0.2"
+    "ionic-plugin-keyboard": "^2.2.1",
+    "ngdropzone": "^2.0.2",
+    "uk.co.workingedge.phonegap.plugin.launchnavigator": "^4.1.5"
   },
   "devDependencies": {
     "bower": "^1.3.3",
@@ -21,7 +32,8 @@
     "cordova-plugin-console",
     "cordova-plugin-device",
     "cordova-plugin-splashscreen",
-    "ionic-plugin-keyboard"
+    "ionic-plugin-keyboard",
+    "uk.co.workingedge.phonegap.plugin.launchnavigator"
   ],
   "cordovaPlatforms": [
     "ios",
@@ -30,5 +42,22 @@
       "version": "",
       "locator": "ios"
     }
-  ]
+  ],
+  "cordova": {
+    "platforms": [
+      "ios"
+    ],
+    "plugins": {
+      "cordova-plugin-splashscreen": {},
+      "ionic-plugin-keyboard": {},
+      "cordova-plugin-console": {},
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-device": {},
+      "cordova-plugin-whitelist": {},
+      "cordova-plugin-datepicker": {},
+      "uk.co.workingedge.phonegap.plugin.launchnavigator": {
+        "LOCATION_USAGE_DESCRIPTION": "This app requires access to your location for navigation purposes"
+      }
+    }
+  }
 }

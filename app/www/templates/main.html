@@ -1,55 +1,67 @@
-<ion-view view-title="Zot-N-Ride">
-	<ion-content>
+<ion-view view-title="Home">
+	<ion-content class="home">
+		<img src="img/logo-speed.png" class="logo"/>
 		<div class="list card">
-			<li class="item item-toggle">
-				Arriving				
-				<label class="toggle toggle-balanced">
-				<input type="checkbox">
-				<div class="track">
-					<div class="handle"></div>
-				</div>
-			</li>
-			<label class="item item-input">
+			<ion-toggle ng-model="activatedArrival" ng-change="toggleRequest(0)">
+				Arrive School
+			</ion-toggle>
+			<label class="item item-input" ng-if="!rideStatus.toSchool.driverID && !rideStatus.toSchool.riderID">
 				<i class="icon ion-calendar placeholder-icon"></i>
-				<input type="datetime" placeholder="Arrival time" ng-model="arrivalTime">
+				<input type="text" ng-click="setArrivalTime()" readonly placeholder="Class Time" ng-model="getArrivalTime" class="timepicker">
 			</label>
-			<label class="item item-input item-select">
-				<i class="icon ion-location placeholder-icon"></i>
-				<div class="input-select">
-					Location
-				</div>
-				<select> 
-					<option selected>Home 1</option>
-					<option>Home 2</option>
-				</select>
-				</label>
-			</label>
+			<div class="item item-body" ng-if="rideStatus.toSchool.riderID">
+				You're picking up {{toSchoolRider.name.first}}. Leave {{getReadableTime(rideStatus.toSchool.calculations.delta_route / 60)}} minutes early on {{formatTime(rideStatus.toSchool.pickupTime - rideStatus.toSchool.calculations.delta_route)}} to arrive on time.
+			</div>
+			<div class="item item-body" ng-if="rideStatus.toSchool.driverID">
+				{{toSchoolDriver.name.first}} will be picking you up on {{formatTime(rideStatus.toSchool.pickupTime - rideStatus.toSchool.calculations.delta_route)}}.
+			</div>
+			<button ng-if="user.isDriver && toSchool.length > 0 && !rideStatus.toSchool.riderID" ng-click='showRequests(0)' class="button-cta item item-icon-left assertive">
+				<i class="icon ion-android-car"></i>
+				View {{toSchool.length}} Requests
+			</button>
+			<button ng-if="rideStatus.toSchool.riderID" ng-click='showProfile(rideStatus.toSchool.riderID)' class="button-cta item item-icon-left assertive">
+				<i class="icon ion-person"></i>
+				View {{toSchoolRider.name.first}}'s Profile
+			</button>
+			<button ng-if="rideStatus.toSchool.riderID" ng-click='navigate(toSchoolRider.address)' class="button-cta item item-icon-left assertive">
+				<i class="icon ion-navigate"></i>
+				Navigate to {{toSchoolRider.name.first}}'s home
+			</button>
+			<button ng-if="rideStatus.toSchool.driverID" ng-click='showProfile(rideStatus.toSchool.driverID)' class="button-cta item item-icon-left assertive">
+				<i class="icon ion-person"></i>
+				View {{toSchoolDriver.name.first}}'s Profile
+			</button>
 		</div>
 		<div class="list card">
-			<li class="item item-toggle">
-				Leaving				
-				<label class="toggle toggle-balanced">
-				<input type="checkbox">
-				<div class="track">
-					<div class="handle"></div>
-				</div>
-			</li>
-			<label class="item item-input">
+			<ion-toggle ng-model="activatedDeparture" ng-change="toggleRequest(1)">
+				Leave School
+			</ion-toggle>
+			<label class="item item-input" ng-if="!rideStatus.fromSchool.driverID && !rideStatus.fromSchool.riderID">
 				<i class="icon ion-calendar placeholder-icon"></i>
-				<input type="datetime" placeholder="Leaving time" ng-model="leaveTime">
+				<input type="text" ng-click="setDepartureTime()" readonly placeholder="Departure time" ng-model="getDepartureTime" class="timepicker">
 			</label>
-			<label class="item item-input item-select">
-				<i class="icon ion-location placeholder-icon"></i>
-				<div class="input-select">
-					Location
-				</div>
-				<select> 
-					<option selected>Parking zone 1</option>
-					<option>Parking zone 2</option>
-					<option>Parking zone 3</option>
-				</select>
-				</label>
-			</label>
+			<div class="item item-body" ng-if="rideStatus.fromSchool.riderID">
+				You're picking up {{fromSchoolRider.name.first}} on {{formatTime(rideStatus.fromSchool.pickupTime)}}.
+			</div>
+			<div class="item item-body" ng-if="rideStatus.fromSchool.driverID">
+				{{fromSchoolDriver.name.first}} will be driving you home on {{formatTime(rideStatus.fromSchool.pickupTime)}}.
+			</div>
+			<button ng-if="user.isDriver && fromSchool.length > 0 && !rideStatus.fromSchool.riderID" ng-click='showRequests(1)' class="button-cta item item-icon-left assertive">
+				<i class="icon ion-android-car"></i>
+				View {{fromSchool.length}} Requests
+			</button>
+			<button ng-if="rideStatus.fromSchool.riderID" ng-click='showProfile(rideStatus.fromSchool.riderID)' class="button-cta item item-icon-left assertive">
+				<i class="icon ion-person"></i>
+				View {{fromSchoolRider.name.first}}'s Profile
+			</button>
+			<button ng-if="rideStatus.fromSchool.riderID" ng-click='navigate(fromSchoolRider.address)' class="button-cta item item-icon-left assertive">
+				<i class="icon ion-navigate"></i>
+				Navigate to {{fromSchoolRider.name.first}}'s home
+			</button>
+			<button ng-if="rideStatus.fromSchool.driverID" ng-click='showProfile(rideStatus.fromSchool.driverID)' class="button-cta item item-icon-left assertive">
+				<i class="icon ion-person"></i>
+				View {{fromSchoolDriver.name.first}}'s Profile
+			</button>
 		</div>
 	</ion-content>
 </ion-view>

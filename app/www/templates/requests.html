@@ -1,0 +1,29 @@
+<ion-modal-view>
+    <ion-header-bar>
+        <h1 class="title">Requests</h1>
+        <button class="button button-clear button-stable" ng-click="closeRequests()">
+            <i class="icon ion-close-round"></i>
+        </button>
+        </div>
+    </ion-header-bar>
+    <ion-content>
+        <div class="card" ng-if="requestDirection" ng-repeat="request in fromSchool">
+            <div class="item item-text-wrap">
+                {{request.riderID}} has requested a ride. You need to leave {{getReadableTime(request.results.delta_route / 60)}} minutes early.
+            </div>
+            <button class="button-cta item item-icon-left assertive" ng-click='acceptRequest(0, request.riderID)'>
+                <i class="icon ion-checkmark-round"></i>
+                Accept
+            </button>
+        </div>
+        <div class="card" ng-if="!requestDirection" ng-repeat="request in toSchool">
+            <div class="item item-text-wrap">
+                {{request.riderID}} has requested a ride. You need to leave {{getReadableTime(request.results.delta_route / 60)}} minutes early.
+            </div>
+            <button class="button-cta item item-icon-left assertive" ng-click='acceptRequest(1, request.riderID)'>
+                <i class="icon ion-checkmark-round"></i>
+                Accept
+            </button>
+        </div>
+    </ion-content>
+</ion-modal-view>
