@@ -32,15 +32,20 @@ input[readonly]:not(.cloned-text-input) {
 	margin: 10px 20px;
 }
 
-.home{
-    background: -webkit-gradient(top, rgb(231, 97, 120), #f5c395);
-    background: -o-linear-gradient(bottom, rgb(231, 97, 120), #f5c395);
-    background: -moz-linear-gradient(bottom, rgb(231, 97, 120), #f5c395);
-    background: linear-gradient(to bottom, rgb(231, 97, 120), #f5c395);
+.home {
+	background: -webkit-gradient(top, rgb(231, 97, 120), #f5c395);
+	background: -o-linear-gradient(bottom, rgb(231, 97, 120), #f5c395);
+	background: -moz-linear-gradient(bottom, rgb(231, 97, 120), #f5c395);
+	background: linear-gradient(to bottom, rgb(231, 97, 120), #f5c395);
 }
 
-.logo{
+.logo {
 	width: 90%;
 	display: block;
 	margin: 30px auto;
+}
+
+.request-button {
+	width: 100%;
+	text-align: left;
 }

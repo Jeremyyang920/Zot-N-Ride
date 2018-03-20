@@ -14,20 +14,6 @@ angular.module('zotnride.controllers', [])
   // Form data for the login modal
   $scope.loginData = {};
   $scope.user = JSON.parse($window.localStorage.getItem('user'));
-  $scope.requests = [
-    {
-      "toSchool": { "time": "123", "riderInfo": "tvwong", leaveAt: "120" }, 
-      "fromSchool": { "time": "234", "riderInfo": "jeremy" } 
-    },
-    {
-      "toSchool": { "time": "123", "riderInfo": "anuj", leaveAt: "120" }, 
-      "fromSchool": { "time": "234", "riderInfo": "meetp" } 
-    },
-    {
-      "toSchool": { "time": "123", "riderInfo": "anuj", leaveAt: "120" }, 
-      "fromSchool": { "time": "234", "riderInfo": "meetp" } 
-    }
-  ];
 
   $ionicModal.fromTemplateUrl('templates/login.html', {
     scope: $scope,
@@ -50,12 +36,19 @@ angular.module('zotnride.controllers', [])
     $scope.loginModal.show();
   };
 
-  $scope.showRequests = function() {
+  $scope.logout = function() {
+    $scope.user = null;
+    $window.localStorage.removeItem('user');
+    $scope.loginModal.show();
+  }
+
+  $scope.showRequests = function(direction) {
     $ionicModal.fromTemplateUrl('templates/requests.html', {
       scope: $scope,
       animation: 'slide-in-up'
     }).then(function(modal) {
       $scope.requestModal = modal;
+      $scope.direction = direction;
       $scope.requestModal.show();
     })
   };
@@ -64,24 +57,117 @@ angular.module('zotnride.controllers', [])
     $scope.requestModal.hide();
   }
 
-  // Reserve Modal
-  $ionicModal.fromTemplateUrl('templates/reserve.html', {
-    scope: $scope,
-    animation: 'slide-in-up'
-  }).then(function(modal) {
-    $scope.reserveModal = modal;
-  });
+  $scope.getReadableTime = function(someNumber) {
+    return Math.ceil(someNumber);
+  }
 
-  $scope.closeReserve = function() {
-    $scope.reserveModal.hide();
+  // Profile Modal
+  $scope.showProfile = function(user) {
+    $ionicModal.fromTemplateUrl('templates/profile.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      $http({
+        method: 'GET',
+        url: API_URL + '/api/user/' + user
+      }).then(function successCallback(response) {
+        $scope.otherUser = response.data;
+      })
+      $scope.profileModal = modal;
+      $scope.profileModal.show();
+    });
+  }
+
+  $scope.closeProfile = function() {
+    $scope.profileModal.hide();
   };
 
-  $scope.showReserve = function() {
-    if (window.localStorage.getItem('uid') === null || window.localStorage.getItem('uid') === '') {
-      $scope.loginModal.show();
-    } else
-    $scope.reserveModal.show();
-  };
+  var getRideStatus = function() {
+    if ($scope.user) {
+      $http({
+        method: 'GET',
+        url: API_URL + '/api/getRideStatus/' + $scope.user.netID
+      }).then(function successCallback(response) {
+        $scope.rideStatus = response.data;
+
+        if (response.data.toSchool) {
+          $scope.activatedArrival = true;
+
+          if (response.data.toSchool.riderID) {
+            $http({
+              method: 'GET',
+              url: API_URL + '/api/user/' + response.data.toSchool.riderID
+            }).then(function successCallback(response) {
+              $scope.toSchoolRider = response.data;
+            })
+          }
+
+          if (response.data.toSchool.driverID) {
+            $http({
+              method: 'GET',
+              url: API_URL + '/api/user/' + response.data.toSchool.driverID
+            }).then(function successCallback(response) {
+              $scope.toSchoolDriver = response.data;
+            })
+          }
+        }
+
+        if (response.data.fromSchool) {
+          $scope.activatedDeparture = true;
+
+          if (response.data.fromSchool.riderID) {
+            $http({
+              method: 'GET',
+              url: API_URL + '/api/user/' + response.data.fromSchool.riderID
+            }).then(function successCallback(response) {
+              $scope.fromSchoolRider = response.data;
+            })
+          }
+
+          if (response.data.fromSchool.driverID) {
+            $http({
+              method: 'GET',
+              url: API_URL + '/api/user/' + response.data.fromSchool.driverID
+            }).then(function successCallback(response) {
+              $scope.fromSchoolDriver = response.data;
+            })
+          }
+        }
+
+        if ($scope.user.isDriver && $scope.activatedArrival && !response.data.toSchool) {
+          getToRequests();
+        }
+
+        if ($scope.user.isDriver && $scope.activatedDeparture && !response.data.fromSchool) {
+          getFromRequests();
+        }
+
+        $timeout(getRideStatus, 30000);
+      })
+    }
+  }
+
+  var getToRequests = function() {
+    $http({
+      method: 'GET',
+      url: API_URL + '/api/getRequests/' + $scope.user.netID + '/0'
+    }).then(function successCallback(response) {
+      $scope.toSchool = response.data;
+    })
+  }
+
+  var getFromRequests = function() {
+    $http({
+      method: 'GET',
+      url: API_URL + '/api/getRequests/' + $scope.user.netID + '/1'
+    }).then(function successCallback(response) {
+      $scope.fromSchool = response.data;
+    })
+  }
+
+  if ($scope.user) {
+    getRideStatus();
+  }
 
   // Perform login
   $scope.doLogin = function() {
@@ -94,8 +180,10 @@ angular.module('zotnride.controllers', [])
       },
       headers: {'Content-Type': 'application/json'}
     }).then(function successCallback(response) {
+      $scope.user = response.data;
       $window.localStorage.setItem('user', JSON.stringify(response.data));
       $scope.loginModal.hide();
+      getRideStatus();
     }, function errorCallback(response) {
       $scope.showLoginFailedAlert = function() {
         var alertPopup = $ionicPopup.alert({
@@ -127,7 +215,7 @@ angular.module('zotnride.controllers', [])
   }
 
   // Autofill schedule
-  if ($scope.user.arrivals) {
+  if ($scope.user && $scope.user.arrivals) {
     var day = new Date().getDay();
     var dayString = getDayString(day);
 
@@ -149,7 +237,7 @@ angular.module('zotnride.controllers', [])
     $scope.arrivalTime = moment().add(1, 'hours').minute(0).second(0);
   }
 
-  if ($scope.user.departures) {
+  if ($scope.user && $scope.user.departures) {
     var day = new Date().getDay();
     var dayString = getDayString(day);
 
@@ -212,7 +300,28 @@ angular.module('zotnride.controllers', [])
   $scope.activatedArrival = false;
   $scope.activatedDeparture = false;
 
-  $scope.acceptRequest = function(index) {
+  $scope.acceptRequest = function(direction, riderID) {
+    $http({
+      method: 'POST',
+      url: API_URL + '/api/confirmRequest',
+      data: {
+        netID: $scope.user.netID,
+        riderID: riderID,
+        direction: direction
+      },
+      headers: {'Content-Type': 'application/json'}
+    }).then(function successCallback(response) {
+      $scope.requestModal.hide();
+    }, function errorCallback(response) {
+      $scope.showAcceptanceFailedAlert = function() {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Acceptance Failed',
+          template: 'Something went wrong!'
+        });
+      };
+
+      $scope.showAcceptanceFailedAlert();
+    });
   }
   
   $scope.declineRequest = function(index) {

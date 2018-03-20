@@ -1,0 +1,19 @@
+<ion-modal-view>
+    <ion-header-bar>
+        <h1 class="title">{{otherUser.name.first}}'s Profile</h1>
+        <button class="button button-clear button-stable" ng-click="closeProfile()">
+            <i class="icon ion-close-round"></i>
+        </button>
+        </div>
+    </ion-header-bar>
+    <ion-content>
+        <div class="list card">
+            <div class="item">
+              <h2>{{otherUser.name.first}} {{otherUser.name.last}}</h2>
+              <p><i class="icon ion-university"></i> {{otherUser.major}}, Year {{otherUser.year}}</p>
+              <p><i class="icon ion-home"></i> {{otherUser.address}}</p>
+              <p><i class="icon ion-iphone"></i> {{otherUser.phone}}</p>
+            </div>
+        </div>
+    </ion-content>
+</ion-modal-view>

@@ -7,18 +7,33 @@
         </div>
     </ion-header-bar>
     <ion-content>
-        <div class="card" ng-repeat="request in requests">
+        <div class="card" ng-if="direction" ng-repeat="request in fromSchool">
             <div class="item item-text-wrap">
-                {{request.toSchool.riderInfo}} has requested a ride. You need to leave {{request.toSchool.leaveAt}} minutes early
+                {{request.riderID}} has requested a ride. You need to leave {{getReadableTime(request.results.delta_route / 60)}} minutes early
             </div>
             <div class="item item-divider button-bar">
-                <button ng-click='declineRequest(requests.indexOf(request))' class="button assertive">
-                        <i class="icon ion-close-round"></i>
-                        Decline
+                <button ng-click='declineRequest(fromSchool.indexOf(request))' class="button assertive">
+                    <i class="icon ion-close-round"></i>
+                    Decline
                 </a>
-                <button ng-click='acceptRequest(requests.indexOf(request))' class="button balanced">
-                        <i class="icon ion-checkmark-round"></i>
-                        Accept
+                <button ng-click='acceptRequest(0, request.riderID)' class="button balanced">
+                    <i class="icon ion-checkmark-round"></i>
+                    Accept
+                </a>
+            </div>
+        </div>
+        <div class="card" ng-if="!direction" ng-repeat="request in toSchool">
+            <div class="item item-text-wrap">
+                {{request.riderID}} has requested a ride. You need to leave {{getReadableTime(request.results.delta_route / 60)}} minutes early
+            </div>
+            <div class="item item-divider button-bar">
+                <button ng-click='declineRequest(toSchool.indexOf(request))' class="button assertive">
+                    <i class="icon ion-close-round"></i>
+                    Decline
+                </a>
+                <button ng-click='acceptRequest(1, request.riderID)' class="button balanced">
+                    <i class="icon ion-checkmark-round"></i>
+                    Accept
                 </a>
             </div>
         </div>
