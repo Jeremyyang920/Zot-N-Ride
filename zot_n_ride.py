@@ -203,10 +203,14 @@ def add_match(driverID:str,riderID:str,direction:int) -> dict:
                                                         'time':driver_request['time'],'calculations':rider['results']})
     return new_match
 
-def remove_match(driverID:str,riderID:str,direction:int) -> bool:
-    if matches.find_one({'driverID':driverID,'riderID':riderID,'direction':direction}) == None:
-        return False
-    result = matches.delete_one({'driverID':driverID,'riderID':riderID,'direction':direction})
+def remove_match(netID:str,direction:int) -> bool:
+    if matches.find_one({'driverID':netID,'direction':direction}) == None:
+        if matches.find_one({'riderID':netID,'direction':direction}) == None:
+            return False
+        else:
+            matches.delete_one({'riderID':netID,'direction':direction})
+    else:
+        matches.delete_one({'driverID':netID,'direction':direction})
     return True
 
 def get_rides(netID:str) -> dict:

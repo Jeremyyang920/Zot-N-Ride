@@ -187,10 +187,10 @@ def end_ride():
     if not request.json:
         abort(400)
     body = request.json
-    query = ZNR.remove_match(body['driverID'],body['riderID'],body['direction'])
+    query = ZNR.remove_match(body['netID'],body['direction'])
     if not query:
         abort(400)
-    return json.dumps({'message':'Ride has ended between {} and {}.'.format(body['driverID'],body['riderID'])})
+    return json.dumps({'message':'Ride has ended for {}.'.format(body['netID'])})
     
 if __name__ == '__main__':
     if DEBUG_FLAG == 'true':
