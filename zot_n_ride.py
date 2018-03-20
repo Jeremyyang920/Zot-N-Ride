@@ -211,6 +211,12 @@ def remove_match(driverID:str,riderID:str,direction:int) -> bool:
 
 def get_rides(netID:str) -> dict:
     result = {}
+    for request in requests.find({}):
+        if request['netID'] == netID: 
+            if request['direction'] == 0:
+                result['toSchool'] = {}
+            elif request['direction'] == 1:
+                result['toSchool'] = {}
     for match in matches.find({}):
         if match['riderID'] == netID:
             if match['direction'] == 0:
@@ -224,8 +230,8 @@ def get_rides(netID:str) -> dict:
                 result['fromSchool'] = {'riderID':match['riderID'],'pickupTime':match['time'],'calculations':match['calculations']}
     return result
 
-def time_stamp_converter(unixTime:int):
-    newTime=datetime.datetime.fromtimestamp(unixTime).strftime('%H%M')
+def time_stamp_converter(unixTime:int) -> int:
+    newTime = datetime.datetime.fromtimestamp(unixTime).strftime('%H%M')
     return int(newTime)
     
 def confirm_email(u:user.User) -> None:
