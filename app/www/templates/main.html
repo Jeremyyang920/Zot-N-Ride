@@ -1,4 +1,4 @@
-<ion-view view-title="">
+<ion-view view-title="Home">
 	<ion-content class="home">
 		<img src="img/logo-speed.png" class="logo"/>
 		<div class="list card">
@@ -7,7 +7,7 @@
 			</ion-toggle>
 			<label class="item item-input" ng-if="!rideStatus.toSchool.driverID && !rideStatus.toSchool.riderID">
 				<i class="icon ion-calendar placeholder-icon"></i>
-				<input type="text" ng-click="setArrivalTime()" readonly placeholder="Class Time" ng-model="getArrivalTime">
+				<input type="text" ng-click="setArrivalTime()" readonly placeholder="Class Time" ng-model="getArrivalTime" class="timepicker">
 			</label>
 			<div class="item item-body" ng-if="rideStatus.toSchool.riderID">
 				You're picking up {{toSchoolRider.name.first}}. Leave {{getReadableTime(rideStatus.toSchool.calculations.delta_route / 60)}} minutes early on {{formatTime(rideStatus.toSchool.pickupTime - rideStatus.toSchool.calculations.delta_route)}} to arrive on time.
@@ -38,7 +38,7 @@
 			</ion-toggle>
 			<label class="item item-input" ng-if="!rideStatus.fromSchool.driverID && !rideStatus.fromSchool.riderID">
 				<i class="icon ion-calendar placeholder-icon"></i>
-				<input type="text" ng-click="setDepartureTime()" readonly placeholder="Departure time" ng-model="getDepartureTime">
+				<input type="text" ng-click="setDepartureTime()" readonly placeholder="Departure time" ng-model="getDepartureTime" class="timepicker">
 			</label>
 			<div class="item item-body" ng-if="rideStatus.fromSchool.riderID">
 				You're picking up {{fromSchoolRider.name.first}} on {{formatTime(rideStatus.fromSchool.pickupTime)}}.

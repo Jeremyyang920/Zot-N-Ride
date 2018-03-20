@@ -11,6 +11,10 @@
 	margin: 30px auto;
 }
 
+.timepicker {
+	background-color: #fff !important;
+}
+
 .button-cta {
 	width: 100%;
 	text-align: left;

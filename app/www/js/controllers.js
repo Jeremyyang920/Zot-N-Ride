@@ -11,10 +11,10 @@ angular.module('zotnride.controllers', [])
   //$scope.$on('$ionicView.enter', function(e) {
   //});
 
-  // Form data for the login modal
   $scope.loginData = {};
   $scope.user = JSON.parse($window.localStorage.getItem('user'));
 
+  // Login modal
   $ionicModal.fromTemplateUrl('templates/login.html', {
     scope: $scope,
     animation: 'slide-in-up'
@@ -36,12 +36,39 @@ angular.module('zotnride.controllers', [])
     $scope.loginModal.show();
   };
 
+  $scope.doLogin = function() {
+    $http({
+      method: 'POST',
+      url: API_URL + '/api/login',
+      data: {
+        netID: $scope.loginData.email,
+        password: $scope.loginData.password
+      },
+      headers: {'Content-Type': 'application/json'}
+    }).then(function successCallback(response) {
+      $scope.user = response.data;
+      $window.localStorage.setItem('user', JSON.stringify(response.data));
+      $scope.loginModal.hide();
+      getRideStatus();
+    }, function errorCallback(response) {
+      $scope.showLoginFailedAlert = function() {
+        var alertPopup = $ionicPopup.alert({
+          title: 'Login Failed',
+          template: 'Email/password is incorrect.'
+        });
+      };
+
+      $scope.showLoginFailedAlert();
+    });
+  };
+
   $scope.logout = function() {
     $scope.user = null;
     $window.localStorage.removeItem('user');
     $scope.loginModal.show();
   }
 
+  // Requests modal
   $scope.showRequests = function(direction) {
     $ionicModal.fromTemplateUrl('templates/requests.html', {
       scope: $scope,
@@ -55,14 +82,6 @@ angular.module('zotnride.controllers', [])
   
   $scope.closeRequests = function() {
     $scope.requestModal.hide();
-  }
-
-  $scope.getReadableTime = function(someNumber) {
-    return Math.ceil(someNumber);
-  }
-
-  $scope.formatTime = function(timestamp) {
-    return moment.unix(timestamp).calendar();
   }
 
   // Profile Modal
@@ -86,6 +105,16 @@ angular.module('zotnride.controllers', [])
     $scope.profileModal.hide();
   };
 
+  // Time formatters
+  $scope.getReadableTime = function(someNumber) {
+    return Math.ceil(someNumber);
+  }
+
+  $scope.formatTime = function(timestamp) {
+    return moment.unix(timestamp).calendar();
+  }
+
+  // Get ride status, recursively calls itself every 30 seconds
   var getRideStatus = function() {
     if ($scope.user) {
       $http({
@@ -153,6 +182,7 @@ angular.module('zotnride.controllers', [])
     }
   }
 
+  // Get all rider requests to school (drivers only)
   var getToRequests = function() {
     $http({
       method: 'GET',
@@ -162,6 +192,7 @@ angular.module('zotnride.controllers', [])
     })
   }
 
+  // Get all rider requests from school (drivers only)
   var getFromRequests = function() {
     $http({
       method: 'GET',
@@ -171,37 +202,12 @@ angular.module('zotnride.controllers', [])
     })
   }
 
+  // Begin recursive call if user is logged in
   if ($scope.user) {
     getRideStatus();
   }
 
-  // Perform login
-  $scope.doLogin = function() {
-    $http({
-      method: 'POST',
-      url: API_URL + '/api/login',
-      data: {
-        netID: $scope.loginData.email,
-        password: $scope.loginData.password
-      },
-      headers: {'Content-Type': 'application/json'}
-    }).then(function successCallback(response) {
-      $scope.user = response.data;
-      $window.localStorage.setItem('user', JSON.stringify(response.data));
-      $scope.loginModal.hide();
-      getRideStatus();
-    }, function errorCallback(response) {
-      $scope.showLoginFailedAlert = function() {
-        var alertPopup = $ionicPopup.alert({
-          title: 'Login Failed',
-          template: 'Email/password is incorrect.'
-        });
-      };
-
-      $scope.showLoginFailedAlert();
-    });
-  };
-
+  // Convert Date.getDay() number [0-6] to its string representations
   var getDayString = function(day) {
     switch(day) {
       case 0:
@@ -220,7 +226,7 @@ angular.module('zotnride.controllers', [])
     }
   }
 
-  // Autofill schedule
+  // Autofill arrival schedule (to school)
   if ($scope.user && $scope.user.arrivals) {
     var day = new Date().getDay();
     var dayString = getDayString(day);
@@ -243,6 +249,7 @@ angular.module('zotnride.controllers', [])
     $scope.arrivalTime = moment().add(1, 'hours').minute(0).second(0);
   }
 
+  // Autofill departure schedule (from school)
   if ($scope.user && $scope.user.departures) {
     var day = new Date().getDay();
     var dayString = getDayString(day);
@@ -275,7 +282,7 @@ angular.module('zotnride.controllers', [])
   })
 
   $ionicPlatform.ready(function() {
-    // Datepicker
+    // Timepickers
     $scope.setArrivalTime = function() {
       $cordovaDatePicker.show({
         date: $scope.arrivalTime,
@@ -302,14 +309,17 @@ angular.module('zotnride.controllers', [])
       });
     }
 
+    // Launch navigation app
     $scope.navigate = function(address) {
       $cordovaLaunchNavigator.navigate(address);
     }
   });
 
+  // Initialize the toggles to `false` so toggleRequest works
   $scope.activatedArrival = false;
   $scope.activatedDeparture = false;
 
+  // Accept rider requests (drivers only)
   $scope.acceptRequest = function(direction, riderID) {
     $http({
       method: 'POST',
@@ -333,20 +343,20 @@ angular.module('zotnride.controllers', [])
       $scope.showAcceptanceFailedAlert();
     });
   }
-  
-  $scope.declineRequest = function(index) {
-    $scope.requests.splice(index, 1);
-  }
 
+  // Toggle requests
   $scope.toggleRequest = function(direction) {
     var endpoint, data = {};
     data.netID = $scope.user.netID;
     data.direction = direction;
 
+    // 0 = to school, 1 = from school
     if (direction === 0) {
       if (!$scope.activatedArrival) {
         endpoint = '/api/addRequest';
         data.time = $scope.arrivalTime.unix();
+      } else if ($scope.rideStatus.toSchool.riderID || $scope.rideStatus.toSchool.driverID) {
+        endpoint = '/api/endRide';
       } else {
         endpoint = '/api/removeRequest';
       }
@@ -356,6 +366,8 @@ angular.module('zotnride.controllers', [])
       if (!$scope.activatedDeparture) {
         endpoint = '/api/addRequest';
         data.time = $scope.arrivalTime.unix();
+      } else if ($scope.rideStatus.fromSchool.riderID || $scope.rideStatus.fromSchool.driverID) {
+        endpoint = '/api/endRide';
       } else {
         endpoint = '/api/removeRequest';
       }
@@ -390,8 +402,6 @@ angular.module('zotnride.controllers', [])
     });
   }
 })
-
-
 
 .controller('RegistrationCtrl', function($scope, $stateParams, $http) {
   $scope.registrationData = {};
