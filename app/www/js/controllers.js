@@ -2,7 +2,7 @@ API_URL = 'https://zot-n-ride-dev.herokuapp.com';
 
 angular.module('zotnride.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $rootScope, $window, $timeout, $ionicHistory, $ionicPlatform, $ionicPopup, $http, $cordovaGeolocation, $cordovaDatePicker) {
+.controller('AppCtrl', function($scope, $ionicModal, $rootScope, $window, $timeout, $ionicHistory, $ionicPlatform, $ionicPopup, $http, $cordovaGeolocation, $cordovaDatePicker, $cordovaLaunchNavigator) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -48,7 +48,7 @@ angular.module('zotnride.controllers', [])
       animation: 'slide-in-up'
     }).then(function(modal) {
       $scope.requestModal = modal;
-      $scope.direction = direction;
+      $scope.requestDirection = direction;
       $scope.requestModal.show();
     })
   };
@@ -59,6 +59,10 @@ angular.module('zotnride.controllers', [])
 
   $scope.getReadableTime = function(someNumber) {
     return Math.ceil(someNumber);
+  }
+
+  $scope.formatTime = function(timestamp) {
+    return moment.unix(timestamp).calendar();
   }
 
   // Profile Modal
@@ -92,6 +96,7 @@ angular.module('zotnride.controllers', [])
 
         if (response.data.toSchool) {
           $scope.activatedArrival = true;
+          $scope.arrivalTime = moment.unix(response.data.toSchool.requestedTime);
 
           if (response.data.toSchool.riderID) {
             $http({
@@ -114,6 +119,7 @@ angular.module('zotnride.controllers', [])
 
         if (response.data.fromSchool) {
           $scope.activatedDeparture = true;
+          $scope.departureTime = moment.unix(response.data.fromSchool.requestedTime);
 
           if (response.data.fromSchool.riderID) {
             $http({
@@ -134,11 +140,11 @@ angular.module('zotnride.controllers', [])
           }
         }
 
-        if ($scope.user.isDriver && $scope.activatedArrival && !response.data.toSchool) {
+        if ($scope.user.isDriver && $scope.activatedArrival && !response.data.toSchool.riderID) {
           getToRequests();
         }
 
-        if ($scope.user.isDriver && $scope.activatedDeparture && !response.data.fromSchool) {
+        if ($scope.user.isDriver && $scope.activatedDeparture && !response.data.fromSchool.riderID) {
           getFromRequests();
         }
 
@@ -294,6 +300,10 @@ angular.module('zotnride.controllers', [])
       }).then(function(datetime) {
         $scope.departureTime = moment(datetime);
       });
+    }
+
+    $scope.navigate = function(address) {
+      $cordovaLaunchNavigator.navigate(address);
     }
   });
 
