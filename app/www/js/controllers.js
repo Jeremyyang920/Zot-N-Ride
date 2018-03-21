@@ -114,7 +114,7 @@ angular.module('zotnride.controllers', [])
     return moment.unix(timestamp).calendar();
   }
 
-  // Get ride status, recursively calls itself every 30 seconds
+  // Get ride status, recursively calls itself every 5 seconds
   var getRideStatus = function() {
     if ($scope.user) {
       $http({
@@ -144,6 +144,9 @@ angular.module('zotnride.controllers', [])
               $scope.toSchoolDriver = response.data;
             })
           }
+        } else if ($scope.activatedArrival) {
+          $scope.activatedArrival = false;
+          autofillArrivalTime();
         }
 
         if (response.data.fromSchool) {
@@ -167,17 +170,20 @@ angular.module('zotnride.controllers', [])
               $scope.fromSchoolDriver = response.data;
             })
           }
+        } else if ($scope.activatedDeparture) {
+          $scope.activatedDeparture = false;
+          autofillDepartureTime();
         }
 
-        if ($scope.user.isDriver && $scope.activatedArrival && !response.data.toSchool.riderID) {
+        if ($scope.user.isDriver && $scope.activatedArrival && response.data.toSchool && !response.data.toSchool.riderID) {
           getToRequests();
         }
 
-        if ($scope.user.isDriver && $scope.activatedDeparture && !response.data.fromSchool.riderID) {
+        if ($scope.user.isDriver && $scope.activatedDeparture && response.data.fromSchool && !response.data.fromSchool.riderID) {
           getFromRequests();
         }
 
-        $timeout(getRideStatus, 30000);
+        $timeout(getRideStatus, 5000);
       })
     }
   }
@@ -227,50 +233,57 @@ angular.module('zotnride.controllers', [])
   }
 
   // Autofill arrival schedule (to school)
-  if ($scope.user && $scope.user.arrivals) {
-    var day = new Date().getDay();
-    var dayString = getDayString(day);
-
-    var dateObj = moment($scope.user.arrivals[dayString], 'Hmm');
-
-    if (dateObj < moment()) {
-      dayString = getDayString(day + 1);
-      $scope.arrivalTime = moment($scope.user.arrivals[dayString], 'Hmm').add(1, 'day');
-      
-      if (day === 5) {
-        $scope.arrivalTime = $scope.arrivalTime.add(2, 'day');
-      } else if (day === 6) {
-        $scope.arrivalTime = $scope.arrivalTime.add(1, 'day');
+  var autofillArrivalTime = function() {
+    if ($scope.user && $scope.user.arrivals) {
+      var day = new Date().getDay();
+      var dayString = getDayString(day);
+  
+      var dateObj = moment($scope.user.arrivals[dayString], 'Hmm');
+  
+      if (dateObj < moment()) {
+        dayString = getDayString(day + 1);
+        $scope.arrivalTime = moment($scope.user.arrivals[dayString], 'Hmm').add(1, 'day');
+        
+        if (day === 5) {
+          $scope.arrivalTime = $scope.arrivalTime.add(2, 'day');
+        } else if (day === 6) {
+          $scope.arrivalTime = $scope.arrivalTime.add(1, 'day');
+        }
+      } else {
+        $scope.arrivalTime = dateObj;
       }
     } else {
-      $scope.arrivalTime = dateObj;
+      $scope.arrivalTime = moment().add(1, 'hours').minute(0).second(0);
     }
-  } else {
-    $scope.arrivalTime = moment().add(1, 'hours').minute(0).second(0);
   }
 
   // Autofill departure schedule (from school)
-  if ($scope.user && $scope.user.departures) {
-    var day = new Date().getDay();
-    var dayString = getDayString(day);
-
-    var dateObj = moment($scope.user.departures[dayString], 'Hmm');
-
-    if (dateObj < moment()) {
-      dayString = getDayString(day + 1);
-      $scope.departureTime = moment($scope.user.departures[dayString], 'Hmm').add(1, 'day');
-
-      if (day === 5) {
-        $scope.departureTime = $scope.departureTime.add(2, 'day');
-      } else if (day === 6) {
-        $scope.departureTime = $scope.departureTime.add(1, 'day');
+  var autofillDepartureTime = function() {
+    if ($scope.user && $scope.user.departures) {
+      var day = new Date().getDay();
+      var dayString = getDayString(day);
+  
+      var dateObj = moment($scope.user.departures[dayString], 'Hmm');
+  
+      if (dateObj < moment()) {
+        dayString = getDayString(day + 1);
+        $scope.departureTime = moment($scope.user.departures[dayString], 'Hmm').add(1, 'day');
+  
+        if (day === 5) {
+          $scope.departureTime = $scope.departureTime.add(2, 'day');
+        } else if (day === 6) {
+          $scope.departureTime = $scope.departureTime.add(1, 'day');
+        }
+      } else {
+        $scope.departureTime = dateObj;
       }
     } else {
-      $scope.departureTime = dateObj;
+      $scope.departureTime = moment().add(3, 'hours').minute(0).second(0);
     }
-  } else {
-    $scope.departureTime = moment().add(3, 'hours').minute(0).second(0);
   }
+
+  autofillArrivalTime();
+  autofillDepartureTime();
 
   // Watch the values and update them when changed
   $scope.$watch('arrivalTime', function() {
@@ -325,7 +338,7 @@ angular.module('zotnride.controllers', [])
       method: 'POST',
       url: API_URL + '/api/confirmRequest',
       data: {
-        netID: $scope.user.netID,
+        driverID: $scope.user.netID,
         riderID: riderID,
         direction: direction
       },
@@ -357,6 +370,7 @@ angular.module('zotnride.controllers', [])
         data.time = $scope.arrivalTime.unix();
       } else if ($scope.rideStatus.toSchool.riderID || $scope.rideStatus.toSchool.driverID) {
         endpoint = '/api/endRide';
+        autofillArrivalTime();
       } else {
         endpoint = '/api/removeRequest';
       }
@@ -365,9 +379,10 @@ angular.module('zotnride.controllers', [])
     } else {
       if (!$scope.activatedDeparture) {
         endpoint = '/api/addRequest';
-        data.time = $scope.arrivalTime.unix();
+        data.time = $scope.departureTime.unix();
       } else if ($scope.rideStatus.fromSchool.riderID || $scope.rideStatus.fromSchool.driverID) {
         endpoint = '/api/endRide';
+        autofillDepartureTime();
       } else {
         endpoint = '/api/removeRequest';
       }
