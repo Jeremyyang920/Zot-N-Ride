@@ -153,10 +153,12 @@ def get_requests(netID,direction):
         return json.dumps(fetch_search[netID])
     '''
     lists = ZNR.load_all_requests()
-    if direction_number == 0:
+    if lists[0] != [] and lists[1] != [] and direction_number == 0:
         return json.dumps(ZNR.match_users_to_uci(lists[0],lists[1])[netID])
-    elif direction_number == 1:
+    elif lists[2] != [] and lists[3] != [] and direction_number == 1:
         return json.dumps(ZNR.match_users_to_home(lists[2],lists[3])[netID])
+    else:
+        return json.dumps({})
 
 # Endpoint to Confirm Match
 @app.route('/api/confirmRequest',methods=['POST'])
